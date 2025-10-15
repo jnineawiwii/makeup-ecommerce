@@ -7,7 +7,7 @@
 }
 
 body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Vollkorn', serif;
     line-height: 1.6;
     color: #0e0d0d;
     background-color: #fff;
@@ -210,7 +210,7 @@ main {
 
 /* ===== PRODUCTOS ===== */
 .products-header h1 {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Vollkorn', serif;
     font-size: 2.8rem;
     font-weight: 700;
     letter-spacing: 2px;
@@ -260,7 +260,7 @@ body.dark-mode .products-header h1 {
 .product-card .description,
 .product-card .price {
     color: #111;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Vollkorn', serif;
     text-align: center;
 }
 
@@ -492,4 +492,103 @@ body.dark-mode .category-filter a.active {
 
 body.dark-mode .category-filter a * {
     color: #fff !important;
+}
+
+/* ===== REGLAS DE MODO OSCURO ADICIONALES (Contraste Completo) ===== */
+
+/* 1. Cambio de color general del cuerpo y elementos base */
+body.dark-mode {
+    background-color: #121212; /* Fondo muy oscuro */
+    color: #eaeaea; /* Texto claro */
+}
+
+/* 2. Navegación */
+body.dark-mode .navbar {
+    background-color: #1b1b1b;
+}
+
+body.dark-mode .nav-menu a:hover {
+    color: #ff99ff; /* Rosa claro en hover */
+}
+
+body.dark-mode .nav-menu a::after {
+    background: #ff99ff; /* Rosa claro para la animación */
+}
+
+body.dark-mode .nav-auth a:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Fondo claro semi-transparente en hover */
+}
+
+/* 3. Buscador */
+body.dark-mode .search-form input {
+    background-color: #2b2b2b; /* Fondo de input oscuro */
+    color: #fff;
+    border-color: #555;
+}
+
+body.dark-mode .search-form button {
+    background: #444;
+}
+
+body.dark-mode .search-form button:hover {
+    background: #c0392b; /* Mantiene color de hover para llamar la atención */
+}
+
+/* 4. Botones Principales */
+body.dark-mode .btn-primary {
+    background-color: #9b59b6; /* Morado/Violeta para contraste */
+    color: #fff;
+}
+
+body.dark-mode .btn-primary:hover {
+    background-color: #8e44ad;
+}
+
+body.dark-mode .btn-secondary {
+    background-color: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+}
+
+body.dark-mode .btn-secondary:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+/* 5. Secciones de Autenticación (Refuerzo) */
+body.dark-mode .auth-form {
+    background: linear-gradient(145deg, #222, #333);
+}
+
+body.dark-mode .auth-form button {
+    background: linear-gradient(135deg, #ff99ff, #8e44ad); /* Asegura gradiente de contraste */
+}
+
+/* 6. Pie de Página */
+body.dark-mode .site-footer {
+    background: #000;
+    color: #ccc;
+    box-shadow: 0 -2px 8px rgba(255, 255, 255, 0.1);
+}
+
+/* 7. Productos (Refuerzo) */
+body.dark-mode .product-card h3,
+body.dark-mode .product-card .description,
+body.dark-mode .product-card .price {
+    color: #fff !important;
+}
+
+body.dark-mode .product-card:hover {
+    box-shadow: 0 8px 32px rgba(255, 255, 255, 0.12);
+}
+
+/* 8. Botón Ver Productos en Hero */
+body.dark-mode .hero .btn-primary {
+    background-color: #9b59b6; /* Fondo morado */
+    color: white;
+}
+
+body.dark-mode .hero .btn-primary:hover {
+    color: #fff; /* Se asegura que el texto sea visible */
+    background-color: #8e44ad;
 }
