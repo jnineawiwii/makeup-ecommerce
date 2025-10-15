@@ -1,0 +1,594 @@
+/* ===== ESTILOS GENERALES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+body {
+    font-family: 'Vollkorn', serif;
+    line-height: 1.6;
+    color: #0e0d0d;
+    background-color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* ===== NAVEGACIÓN ===== */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    background-color: #000;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-brand a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-menu a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s;
+    position: relative;
+}
+
+.nav-menu a:hover {
+    color: rgb(0, 0, 0);
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: pink;
+    left: 0;
+    bottom: -5px;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.nav-menu a:hover::after {
+    transform: scaleX(1);
+}
+
+.nav-auth {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.nav-auth a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.nav-auth a:hover {
+    background-color: rgba(12, 12, 12, 0.1);
+}
+
+.nav-auth span {
+    color: white;
+    margin-right: 1rem;
+}
+
+.nav-menu span {
+    color: white;
+    margin-left: 15px;
+}
+
+/* ===== BUSCADOR ===== */
+.search-container {
+    flex: 1;
+    max-width: 400px;
+    margin: 0 20px;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+}
+
+.search-form input {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+    width: 100%;
+    font-size: 14px;
+}
+
+.search-form button {
+    padding: 8px 15px;
+    background: #090201;
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.search-form button:hover {
+    background: #c0392b;
+}
+
+/* ===== HERO SECTION ===== */
+.hero {
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+        url('https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.hero .btn-primary {
+    transition: color 0.3s ease;
+    background-color: #000;
+    color: white;
+}
+
+.hero .btn-primary:hover {
+    color: #000000;
+}
+
+/* ===== BOTONES ===== */
+.btn-primary,
+.btn-secondary {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: #000;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0e0303;
+    color: white;
+}
+
+.btn-primary.ver-productos:hover {
+    background-color: #000;
+    color: pink;
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid #000;
+    color: #000;
+}
+
+.btn-secondary:hover {
+    background-color: #000;
+    color: white;
+}
+
+/* ===== PRODUCTOS ===== */
+.products-header h1 {
+    font-family: 'Vollkorn', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 2rem;
+    color: #111;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+body.dark-mode .products-header h1 {
+    color: #fff;
+}
+
+/* Fichas de productos cuadradas y en cuadrícula */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 2rem 5%;
+}
+
+.product-card {
+    border: 2px solid #fcfafa;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+    transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+}
+
+.product-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0.5rem;
+    transition: transform 0.3s;
+}
+
+.product-card:hover img {
+    transform: scale(1.05);
+}
+
+.product-card h3,
+.product-card .description,
+.product-card .price {
+    color: #111;
+    font-family: 'Vollkorn', serif;
+    text-align: center;
+}
+
+.price {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+/* ===== FILTRO DE CATEGORÍAS ===== */
+.category-filter {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 2rem 0 2.5rem;
+}
+
+.category-filter a {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.7rem 2rem;
+    border-radius: 30px;
+    border: 2px solid #111;
+    background: #fff;
+    color: #111;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.category-filter a.active,
+.category-filter a:hover {
+    background: #111;
+    color: #ffffff;
+    border-color: #111;
+}
+
+.category-filter a svg {
+    filter: none;
+}
+
+/* ===== INICIO DE SESIÓN Y REGISTRO PREMIUM ===== */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 75vh;
+    padding: 2rem;
+}
+
+.auth-form {
+    background: linear-gradient(145deg, #fff, #f0f0f0);
+    padding: 3rem 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    transition: background 0.3s ease, color 0.3s ease;
+    position: relative;
+}
+
+.auth-form h2 {
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    color: #111;
+    font-weight: 700;
+}
+
+.auth-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #111;
+    text-align: left;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #fff;
+    color: #111;
+}
+
+.auth-form input:focus {
+    border-color: #9b59b6;
+    outline: none;
+    box-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
+}
+
+.auth-form button {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.auth-form button:hover {
+    transform: scale(1.05);
+}
+
+/* ===== FOOTER ===== */
+.site-footer {
+    background: #111;
+    color: #fff;
+    text-align: center;
+    padding: 18px 0;
+    font-size: 1rem;
+    margin-top: auto;
+    width: 100%;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+}
+
+/* ===== MODO OSCURO AJUSTADO ===== */
+body.dark-mode {
+    background-color: #121212;
+    color: #eaeaea;
+}
+
+body.dark-mode .navbar {
+    background-color: #1b1b1b;
+}
+
+body.dark-mode .nav-menu a,
+body.dark-mode .nav-auth a,
+body.dark-mode .nav-auth span {
+    color: #fff;
+}
+
+/* Botones modo oscuro */
+body.dark-mode .btn-primary.ver-productos,
+body.dark-mode .search-form button,
+body.dark-mode .product-search .btn-primary {
+    color: #fff; /* Letras blancas */
+    background-color: #9b59b6; /* Fondo morado */
+}
+
+body.dark-mode .btn-primary.ver-productos:hover,
+body.dark-mode .search-form button:hover,
+body.dark-mode .product-search .btn-primary:hover {
+    color: #fff; /* Letras blancas al pasar cursor */
+    background-color: #000; /* Fondo negro */
+}
+
+/* Inicio de sesión y registro modo oscuro */
+body.dark-mode .auth-form {
+    background: linear-gradient(145deg, #222, #333);
+}
+
+body.dark-mode .auth-form h2,
+body.dark-mode .auth-form label,
+body.dark-mode .auth-form input {
+    color: #fff;
+}
+
+body.dark-mode .auth-form input {
+    background-color: #1b1b1b;
+    border-color: #555;
+}
+
+body.dark-mode .auth-form button {
+    color: #fff;
+}
+
+/* === MODO OSCURO TARJETAS DE PRODUCTO === */
+body.dark-mode .product-card {
+    background-color: #111;
+    color: #fff;
+    border: 1px solid #fff;
+}
+
+body.dark-mode .product-card h3,
+body.dark-mode .product-card p,
+body.dark-mode .product-card span {
+    color: #fff !important;
+}
+
+body.dark-mode .product-card .btn-add {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #fff;
+}
+
+body.dark-mode .product-card .btn-add:hover {
+    background-color: #e5e5e5;
+    color: #000;
+}
+
+body.dark-mode .product-card .btn-details {
+    background-color: transparent;
+    color: #fff;
+    border: 1px solid #fff;
+}
+
+body.dark-mode .product-card .btn-details:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+/* === MODO OSCURO BOTONES DE CATEGORÍAS === */
+body.dark-mode .category-filter a {
+    background-color: #111 !important;
+    color: #fff !important; 
+    border: 1px solid #fff !important;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .category-filter a:hover,
+body.dark-mode .category-filter a.active {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #fff !important;
+    transform: scale(1.05);
+}
+
+body.dark-mode .category-filter a * {
+    color: #fff !important;
+}
+
+/* ===== REGLAS DE MODO OSCURO ADICIONALES (Contraste Completo) ===== */
+
+/* 1. Cambio de color general del cuerpo y elementos base */
+body.dark-mode {
+    background-color: #121212; /* Fondo muy oscuro */
+    color: #eaeaea; /* Texto claro */
+}
+
+/* 2. Navegación */
+body.dark-mode .navbar {
+    background-color: #1b1b1b;
+}
+
+body.dark-mode .nav-menu a:hover {
+    color: #ff99ff; /* Rosa claro en hover */
+}
+
+body.dark-mode .nav-menu a::after {
+    background: #ff99ff; /* Rosa claro para la animación */
+}
+
+body.dark-mode .nav-auth a:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Fondo claro semi-transparente en hover */
+}
+
+/* 3. Buscador */
+body.dark-mode .search-form input {
+    background-color: #2b2b2b; /* Fondo de input oscuro */
+    color: #fff;
+    border-color: #555;
+}
+
+body.dark-mode .search-form button {
+    background: #444;
+}
+
+body.dark-mode .search-form button:hover {
+    background: #c0392b; /* Mantiene color de hover para llamar la atención */
+}
+
+/* 4. Botones Principales */
+body.dark-mode .btn-primary {
+    background-color: #9b59b6; /* Morado/Violeta para contraste */
+    color: #fff;
+}
+
+body.dark-mode .btn-primary:hover {
+    background-color: #8e44ad;
+}
+
+body.dark-mode .btn-secondary {
+    background-color: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+}
+
+body.dark-mode .btn-secondary:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+/* 5. Secciones de Autenticación (Refuerzo) */
+body.dark-mode .auth-form {
+    background: linear-gradient(145deg, #222, #333);
+}
+
+body.dark-mode .auth-form button {
+    background: linear-gradient(135deg, #ff99ff, #8e44ad); /* Asegura gradiente de contraste */
+}
+
+/* 6. Pie de Página */
+body.dark-mode .site-footer {
+    background: #000;
+    color: #ccc;
+    box-shadow: 0 -2px 8px rgba(255, 255, 255, 0.1);
+}
+
+/* 7. Productos (Refuerzo) */
+body.dark-mode .product-card h3,
+body.dark-mode .product-card .description,
+body.dark-mode .product-card .price {
+    color: #fff !important;
+}
+
+body.dark-mode .product-card:hover {
+    box-shadow: 0 8px 32px rgba(255, 255, 255, 0.12);
+}
+
+/* 8. Botón Ver Productos en Hero */
+body.dark-mode .hero .btn-primary {
+    background-color: #9b59b6; /* Fondo morado */
+    color: white;
+}
+
+body.dark-mode .hero .btn-primary:hover {
+    color: #fff; /* Se asegura que el texto sea visible */
+    background-color: #8e44ad;
+}

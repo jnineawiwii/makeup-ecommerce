@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAC Style Makeup Store</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vollkorn:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+        color: #0e0d0d;
+    }
+
+    header nav.navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background: linear-gradient(to right, #080808, #0a031d);
+        color: white;
+        flex-wrap: wrap;
+    }
+
+    .nav-brand a {
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+        text-decoration: none;
+    }
+
+    .nav-menu, .nav-auth {
+        display: flex;
+        list-style: none;
+        gap: 15px;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav-menu a, .nav-auth a, .nav-auth span {
+        color: white;
+        text-decoration: none;
+    }
+
+    .admin-section a {
+        color: pink !important;
+        font-weight: bold;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    /* Botón modo oscuro */
+    .theme-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #fff;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .theme-toggle .icon { width: 22px; height: 22px; transition: opacity 0.3s ease, transform 0.3s ease; }
+    .theme-toggle .hidden { display: none; }
+
+    .search-container input { padding: 6px 12px; border-radius: 4px 0 0 4px; border: 1px solid #ddd; font-size: 14px; }
+    .search-container button { padding: 6px 12px; background: #0f0f0f; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer; }
+    .search-container button:hover { background: #0e0e0e; }
+
+    /* Carrito */
+    .cart-icon { position: relative; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    #cart-count { display: flex; justify-content: center; align-items: center; background: red; color: white; font-size: 12px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; position: absolute; top: -5px; right: -10px; }
+
+    /* Modo oscuro */
+    body.dark-mode { background-color: #0b0b0b; color: #f5f5f5; }
+    body.dark-mode nav.navbar { background: linear-gradient(to right, #1a1a1a, #2c003e); }
+    body.dark-mode a, body.dark-mode span { color: #ffd6f3; }
+    /* Corrige color de texto en botones de categorías en modo oscuro */
+body.dark-mode .category-filter a {
+    color: #ffffff !important; /* negro */
+}
+
+
+    /* Sección “Nuestros productos” */
+    .product-section { margin: 20px; }
+    .product-title { font-size: 28px; font-weight: bold; color: #0e0d0d; margin-bottom: 15px; }
+    body.dark-mode .product-title { color: #f5f5f5; }
+
+    .product-categories { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .product-categories button {
+        padding: 8px 15px;
+        font-weight: bold;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        background-color: #fff;
+        color: #000000; /* rosa claro */
+        transition: 0.3s;
+    }
+    .product-categories button:hover { background-color: #fce4f1; transform: translateY(-2px); }
+
+    /* Modo oscuro botones de categorías */
+    body.dark-mode .product-categories button {
+        background-color: #2b2b2b;
+        color: #000000; /* morado en modo oscuro */
+        border: 1px solid #555;
+    }
+    body.dark-mode .product-categories button:hover { background-color: #3d1a3f; color: #fff; }
+
+    /* Responsivo */
+    @media (max-width: 768px) {
+        .navbar { flex-direction: column; gap: 10px; }
+        .nav-menu, .nav-auth { flex-wrap: wrap; justify-content: center; }
+        .nav-right { flex-direction: column; gap: 10px; width: 100%; }
+        .product-categories { justify-content: center; }
+    }
+
+    /* Flash messages */
+    .flash-messages { position: fixed; top: 10px; right: 10px; z-index: 1000; max-width: 300px; }
+    .flash-message { display: flex; align-items: center; padding: 10px 15px; margin-bottom: 10px; border-radius: 4px; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); color: white; }
+    .flash-success { background-color: #28a745; }
+    .flash-error { background-color: #dc3545; }
+    .flash-info { background-color: #007bff; }
+    .flash-warning { background-color: #ffc107; color: black; }
+</style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="{{ url_for('index') }}" class="mac-style">MAC Style</a></div>
+        <div class="nav-right">
+            <div class="search-container">
+                <form action="{{ url_for('search') }}" method="GET" class="search-form">
+                    <input type="text" name="q" placeholder="Buscar productos..." value="{{ request.args.get('q', '') }}">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema">
+                <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h1M4 12H3m15.364-7.364l.707.707M6.343 17.657l-.707.707m12.728 0l.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                </svg>
+                <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="icon hidden">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+                </svg>
+            </button>
+        </div>
+
+        <ul class="nav-menu">
+            {% if current_user.is_authenticated and current_user.is_admin() %}
+                <li class="admin-section"><a href="{{ url_for('admin_dashboard') }}">Administración</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('products') }}">Productos</a></li>
+            <li><a href="{{ url_for('products', category='labios') }}">Labios</a></li>
+            <li><a href="{{ url_for('products', category='ojos') }}">Ojos</a></li>
+            <li><a href="{{ url_for('products', category='rostro') }}">Rostro</a></li>
+        </ul>
+
+        <ul class="nav-auth">
+            {% if current_user.is_authenticated %}
+                <li><span>Hola, {{ current_user.username }}</span></li>
+                <li>
+                    <a href="{{ url_for('cart') }}" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count">0</span>
+                    </a>
+                </li>
+                <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Iniciar Sesión</a></li>
+                <li><a href="{{ url_for('register') }}">Registrarse</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+
+<main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">
+              <i class="fas fa-exclamation-circle"></i> {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <p>© 2023 MAC Style Makeup Store. Proyecto estudiantil sin derechos de autor.</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+    // Modo oscuro/claro
+    const toggleBtn = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const darkMode = document.body.classList.contains('dark-mode');
+        if (darkMode) {
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+            localStorage.setItem('theme', 'light');
+        }
+    });
+</script>
+</body>
+</html>
