@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="confirmation-container">
+    <div class="confirmation-content">
+        <div class="confirmation-icon">✅</div>
+        <h1>¡Pedido Confirmado!</h1>
+        <p class="confirmation-message">Gracias por tu compra en MAC Style Makeup Store.</p>
+        
+        <div class="order-details">
+            <div class="detail-item">
+                <span class="detail-label">Número de pedido:</span>
+                <span class="detail-value">#{{ "%04d" | format(random_number) }}</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Total:</span>
+                <span class="detail-value">${{ "%.2f"|format(total) }}</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Fecha estimada de entrega:</span>
+                <span class="detail-value">3-5 días hábiles</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Estado:</span>
+                <span class="detail-value status-processing">Procesando</span>
+            </div>
+        </div>
+
+        <div class="confirmation-actions">
+            <a href="{{ url_for('products') }}" class="btn-primary">Seguir Comprando</a>
+            <a href="{{ url_for('index') }}" class="btn-secondary">Volver al Inicio</a>
+        </div>
+
+        <div class="support-info">
+            <h3>¿Necesitas ayuda?</h3>
+            <p>Estamos aquí para ayudarte con tu pedido.</p>
+            <p>📧 <a href="mailto:soporte@macstyle.com">soporte@macstyle.com</a></p>
+            <p>📞 +1 (555) 123-4567</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

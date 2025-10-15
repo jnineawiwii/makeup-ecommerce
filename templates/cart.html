@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="cart-container">
+    <h1>Tu Carrito de Compras</h1>
+    
+    {% if cart_items %}
+    <div class="cart-items">
+        {% for item in cart_items %}
+        <div class="cart-item" data-product-id="{{ item.product.id }}" data-product-name="{{ item.product.name }}">
+            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" onerror="this.src='https://via.placeholder.com/100x100/e0e0e0/666666?text=Imagen'">
+            <div class="item-details">
+                <h3>{{ item.product.name }}</h3>
+                <p class="price">${{ "%.2f"|format(item.product.price) }}</p>
+            </div>
+            <div class="quantity-controls">
+                <button class="quantity-btn" data-action="decrease" data-product-id="{{ item.product.id }}">-</button>
+                <span class="quantity">{{ item.quantity }}</span>
+                <button class="quantity-btn" data-action="increase" data-product-id="{{ item.product.id }}">+</button>
+            </div>
+            <div class="item-total">
+                ${{ "%.2f"|format(item.total) }}
+            </div>
+            <button class="remove-item" data-product-id="{{ item.product.id }}">Eliminar</button>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="cart-summary">
+        <h2>Total: ${{ "%.2f"|format(total) }}</h2>
+        <a href="{{ url_for('checkout') }}" class="btn-primary">Proceder al pago</a>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <p>Tu carrito está vacío</p>
+        <a href="{{ url_for('products') }}" class="btn-primary">Seguir comprando</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Agregar event listeners a todos los botones de eliminar
+        const removeButtons = document.querySelectorAll('.remove-item');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                removeItemFromCart(productId);
+            });
+        });
+        
+        // Función para eliminar producto del carrito (sin confirmación)
+        function removeItemFromCart(productId) {
+            fetch('/remove_from_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: parseInt(productId)
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Encontrar el elemento del carrito y eliminarlo
+                    const itemToRemove = document.querySelector(`.cart-item[data-product-id="${productId}"]`);
+                    if (itemToRemove) {
+                        itemToRemove.remove();
+                        
+                        // Actualizar el total
+                        if (data.total !== undefined) {
+                            document.querySelector('.cart-summary h2').textContent = `Total: $${data.total.toFixed(2)}`;
+                        }
+                        
+                        // Si no quedan items, mostrar carrito vacío
+                        const remainingItems = document.querySelectorAll('.cart-item');
+                        if (remainingItems.length === 0) {
+                            document.querySelector('.cart-items').innerHTML = `
+                                <div class="empty-cart">
+                                    <p>Tu carrito está vacío</p>
+                                    <a href="{{ url_for('products') }}" class="btn-primary">Seguir comprando</a>
+                                </div>
+                            `;
+                            document.querySelector('.cart-summary').style.display = 'none';
+                        }
+                        
+                        // Mostrar mensaje de éxito
+                        showNotification('Producto eliminado del carrito');
+                    }
+                } else {
+                    showNotification('Error: ' + data.message, true);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error al eliminar el producto', true);
+            });
+        }
+        
+        // Función para mostrar notificación
+        function showNotification(message, isError = false) {
+            // Crear elemento de notificación
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.right = '20px';
+            notification.style.backgroundColor = isError ? '#e74c3c' : '#27ae60';
+            notification.style.color = 'white';
+            notification.style.padding = '12px 20px';
+            notification.style.borderRadius = '4px';
+            notification.style.zIndex = '1000';
+            notification.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.2)';
+            
+            document.body.appendChild(notification);
+            
+            // Eliminar la notificación después de 3 segundos
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // También agregar funcionalidad a los botones de cantidad si es necesario
+        const quantityButtons = document.querySelectorAll('.quantity-btn');
+        quantityButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const action = this.getAttribute('data-action');
+                const productId = this.getAttribute('data-product-id');
+                const quantityElement = this.parentElement.querySelector('.quantity');
+                let quantity = parseInt(quantityElement.textContent);
+                
+                if (action === 'increase') {
+                    quantity++;
+                    updateQuantity(productId, quantity, quantityElement);
+                } else if (action === 'decrease' && quantity > 1) {
+                    quantity--;
+                    updateQuantity(productId, quantity, quantityElement);
+                }
+            });
+        });
+        
+        // Función para actualizar la cantidad
+        function updateQuantity(productId, quantity, quantityElement) {
+            fetch('/update_cart_quantity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: parseInt(productId),
+                    quantity: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar la cantidad mostrada
+                    quantityElement.textContent = quantity;
+                    
+                    // Recargar la página para actualizar los totales
+                    window.location.reload();
+                } else {
+                    showNotification('Error: ' + data.message, true);
+                    // Recargar para restaurar cantidades correctas
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error al actualizar la cantidad', true);
+                window.location.reload();
+            });
+        }
+    });
+</script>
+
+<style>
+    .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+        position: relative;
+    }
+    
+    .remove-item {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+        margin-left: 15px;
+    }
+    
+    .remove-item:hover {
+        background: #c0392b;
+    }
+</style>
+{% endblock %}

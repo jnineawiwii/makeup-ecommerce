@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAC Style Makeup Store</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos para el buscador y navbar */
+        .video-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 20px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .video-overlay {
+            padding: 10px;
+        }
+
+        .video-overlay h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .video-overlay p {
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .video-overlay a {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 20px;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-form input {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .search-form button {
+            padding: 8px 15px;
+            background: #0f0f0f;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        .search-form button:hover {
+            background: #0e0e0e;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: linear-gradient(to right, #080808, #0a031d);
+            color: white;
+        }
+
+        .nav-brand a {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-auth {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-auth a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .admin-section a {
+            color: pink !important;
+            font-weight: bold;
+        }
+
+        /* Estilos responsivos */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-container {
+                margin: 10px 0;
+                max-width: 100%;
+            }
+            
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            
+            .nav-auth {
+                justify-content: center;
+            }
+        }
+
+        .flash-messages {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            width: auto;
+            max-width: 300px;
+        }
+
+        .flash-message {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .flash-message i {
+            margin-right: 8px;
+        }
+
+        .flash-success {
+            background-color: #28a745;
+        }
+
+        .flash-error {
+            background-color: #dc3545;
+        }
+
+        .flash-info {
+            background-color: #007bff;
+        }
+
+        .flash-warning {
+            background-color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <a href="{{ url_for('index') }}" class="mac-style">MAC Style</a>
+            </div>
+
+            <!-- Buscador -->
+            <div class="search-container">
+                <form action="{{ url_for('search') }}" method="GET" class="search-form">
+                    <input type="text" name="q" placeholder="Buscar productos..." value="{{ request.args.get('q', '') }}">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+
+            <ul class="nav-menu">
+                {% if current_user.is_authenticated and current_user.is_admin() %}
+                    <li class="admin-section">
+                        <a href="{{ url_for('admin_dashboard') }}">Administración</a>
+                    </li>
+                {% endif %}
+
+                <li><a href="{{ url_for('products') }}">Productos</a></li>
+                <li><a href="{{ url_for('products', category='labios') }}">Labios</a></li>
+                <li><a href="{{ url_for('products', category='ojos') }}">Ojos</a></li>
+                <li><a href="{{ url_for('products', category='rostro') }}">Rostro</a></li>
+
+                {% if current_user.is_authenticated %}
+                    <li><span style="color: white;">Hola, {{ current_user.username }}</span></li>
+                    <li><a href="{{ url_for('cart') }}">Carrito</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Iniciar Sesión</a></li>
+                    <li><a href="{{ url_for('register') }}">Registrarse</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">
+                  <i class="fas fa-exclamation-circle"></i> {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2023 MAC Style Makeup Store. Proyecto estudiantil sin derechos de autor.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // Si el usuario no está autenticado, fuerza recarga en páginas privadas
+        {% if not current_user.is_authenticated %}
+        if (window.location.pathname.startsWith('/cart') ||
+            window.location.pathname.startsWith('/checkout') ||
+            window.location.pathname.startsWith('/admin')) {
+            window.location.href = "{{ url_for('index') }}";
+        }
+        {% endif %}
+    </script>
+</body>
+</html>

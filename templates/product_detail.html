@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="product-detail">
+    <div class="product-detail-container">
+        <div class="product-image">
+            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+        </div>
+        <div class="product-info">
+            <h1>{{ product.name }}</h1>
+            <p class="category">{{ product.category|capitalize }}</p>
+            <p class="description">{{ product.description }}</p>
+            <p class="price">${{ "%.2f"|format(product.price) }}</p>
+            <div class="product-actions">
+                <button class="btn-primary add-to-cart" data-product-id="{{ product.id }}">Añadir al carrito</button>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Belleza profesional a tu alcance</h1>
+        <p>Descubre los productos que realzan tu belleza natural</p>
+        <a href="{{ url_for('products') }}" class="btn-primary">Ver productos</a>
+    </div>
+</section>
+
+<section class="featured-products">
+    <h2>Productos destacados</h2>
+    <div class="products-grid">
+        {% for product in featured_products %}
+        <div class="product-card">
+            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            <h3>{{ product.name }}</h3>
+            <p class="price">${{ "%.2f"|format(product.price) }}</p>
+            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn-secondary">Ver detalles</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Video destacado desde la base de datos -->
+{% if featured_video %}
+<div class="featured-video" style="margin-top: 40px;">
+    <div style="max-width: 1000px; margin-left: auto; margin-right: auto;">
+        <h2 style="text-align:center; font-size:2rem; font-weight:700; margin-bottom:20px; color:#111;">
+            {{ featured_video.title }}
+        </h2>
+        
+        {% if featured_video.description %}
+        <p style="text-align:center; margin-bottom:25px; color:#555; font-size:1.1rem;">
+            {{ featured_video.description }}
+        </p>
+        {% endif %}
+        
+        <div class="video-container">
+            {% if featured_video.file_path %}
+                <!-- Video subido directamente -->
+                <video id="promoVideo" controls autoplay muted>
+                    <source src="{{ url_for('static', filename=featured_video.file_path) }}" type="video/mp4">
+                    Tu navegador no soporta el elemento de video.
+                </video>
+            {% elif featured_video.url %}
+                <!-- Video embebido (YouTube/Vimeo) -->
+                <iframe src="{{ featured_video.url }}" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            {% endif %}
+        </div>
+        
+        {% if featured_video.category %}
+        <div style="text-align:center; margin-top:15px;">
+            <span style="background:linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%); color:white; padding:6px 16px; border-radius:20px; font-size:0.85rem;">
+                {{ featured_video.category }}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Más videos si existen -->
+{% if other_videos and other_videos|length > 0 %}
+<section class="videos-section" style="margin-top: 60px; padding: 20px;">
+    <h2 style="text-align:center; font-size:2rem; font-weight:700; margin-bottom:30px; color:#111;">
+       CONOCENOS!!
+    </h2>
+    
+    <div class="videos-grid">
+        {% for video in other_videos %}
+        <div class="video-card">
+            <div class="video-container">
+                {% if video.file_path %}
+                    <!-- Video subido directamente -->
+                    <video controls>
+                        <source src="{{ url_for('static', filename=video.file_path) }}" type="video/mp4">
+                    </video>
+                {% elif video.url %}
+                    <iframe src="{{ video.url }}" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                    </iframe>
+                {% endif %}
+            </div>
+            <div class="video-info">
+                <h3>{{ video.title }}</h3>
+                {% if video.description %}
+                <p>{{ video.description|truncate(100) }}</p>
+                {% endif %}
+                {% if video.category %}
+                <span class="video-category">{{ video.category }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<style>
+/* Estilos específicos para los videos en esta página */
+.featured-video {
+    padding: 0 5%;
+}
+
+.videos-section {
+    padding: 0 5%;
+}
+
+.video-category {
+    background: #f1f1f1;
+    color: #555;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+/* Asegurar que los videos tengan el mismo tamaño */
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+    height: 0;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.video-container video,
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 12px;
+}
+
+/* Grid para videos secundarios */
+.videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.video-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+}
+
+.video-info {
+    padding: 20px;
+}
+
+.video-info h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: #222;
+}
+
+.video-info p {
+    color: #666;
+    margin: 0 0 15px 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Video destacado más grande */
+.featured-video .video-container {
+    padding-bottom: 45%; /* Más panorámico para video destacado */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .videos-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .featured-video .video-container {
+        padding-bottom: 56.25%; /* Volver a 16:9 en móviles */
+    }
+}
+</style>
+{% endblock %}

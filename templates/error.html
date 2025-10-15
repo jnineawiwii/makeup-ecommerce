@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flash-messages" style="position:static; max-width:600px; margin:60px auto;">
+    <div class="flash-message flash-error" style="font-size:1.3rem;">
+        <i class="fas fa-exclamation-triangle"></i>
+        Error 404: Página no encontrada
+    </div>
+    <div style="text-align:center; margin-top:20px;">
+        <a href="{{ url_for('index') }}" class="btn-primary">Volver al inicio</a>
+    </div>
+    <div style="margin-top:40px;">
+        <p>
+            La página que buscas no existe o fue movida.<br>
+            Si crees que esto es un error, contáctanos.<br>
+            <img src="{{ url_for('static', filename='images/mac.png') }}" alt="Imagen de ejemplo" style="width:100px;">
+            <br>
+            <span style="display:block;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut laoreet cursus, enim erat dictum urna, nec dictum massa enim nec enim. Etiam euismod, nunc ut laoreet cursus, enim erat dictum urna, nec dictum massa enim nec enim.</span>
+        </p>
+    </div>
+</div>
+{% endblock %}

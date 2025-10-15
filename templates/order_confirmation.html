@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Pedido - MAC Style</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .confirmation-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .confirmation-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .confirmation-icon {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+
+        .confirmation-message {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .order-details {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .detail-value {
+            color: #666;
+        }
+
+        .status-processing {
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        .confirmation-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .support-info {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .support-info h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .support-info a {
+            color: #0070ba;
+            text-decoration: none;
+        }
+
+        .support-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .confirmation-content {
+                padding: 1.5rem;
+            }
+            
+            .confirmation-actions {
+                flex-direction: column;
+            }
+            
+            .detail-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <a href="{{ url_for('index') }}">MAC Style</a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('products') }}">Productos</a></li>
+                <li><a href="{{ url_for('products', category='labios') }}">Labios</a></li>
+                <li><a href="{{ url_for('products', category='ojos') }}">Ojos</a></li>
+                <li><a href="{{ url_for('products', category='rostro') }}">Rostro</a></li>
+            </ul>
+            <div class="nav-auth">
+                {% if current_user.is_authenticated %}
+                    <span>Hola, {{ current_user.username }}</span>
+                    <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Iniciar Sesión</a>
+                    <a href="{{ url_for('register') }}">Registrarse</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="confirmation-container">
+            <div class="confirmation-content">
+                <div class="confirmation-icon">✅</div>
+                <h1>¡Pedido Confirmado!</h1>
+                <p class="confirmation-message">Gracias por tu compra en MAC Style Makeup Store.</p>
+                
+                <div class="order-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Número de pedido:</span>
+                        <span class="detail-value">#{{ random_number }}</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">Total:</span>
+                        <span class="detail-value">${{ "%.2f"|format(total) }}</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">Fecha estimada de entrega:</span>
+                        <span class="detail-value">3-5 días hábiles</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">Estado:</span>
+                        <span class="detail-value status-processing">Procesando</span>
+                    </div>
+                </div>
+
+                <div class="confirmation-actions">
+                    <a href="{{ url_for('products') }}" class="btn-primary">Seguir Comprando</a>
+                    <a href="{{ url_for('index') }}" class="btn-secondary">Volver al Inicio</a>
+                </div>
+
+                <div class="support-info">
+                    <h3>¿Necesitas ayuda?</h3>
+                    <p>Estamos aquí para ayudarte con tu pedido.</p>
+                    <p>📧 <a href="mailto:soporte@macstyle.com">soporte@macstyle.com</a></p>
+                    <p>📞 +1 (555) 123-4567</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 MAC Style Makeup Store.Proyecto estudiantil sin derechos de autor.</p>
+    </footer>
+</body>
+</html>

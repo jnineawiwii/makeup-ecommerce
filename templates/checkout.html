@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="checkout-container">
+    <h1>Finalizar Compra</h1>
+    
+    {% if cart_items %}
+    <div class="checkout-content">
+        <!-- SECCIÓN DE INFORMACIÓN DE ENVÍO -->
+        <div class="checkout-form-section">
+            <h2>Información de Envío</h2>
+            
+            <form id="shipping-form">
+                <div class="form-group">
+                    <label for="full_name">Nombre completo *</label>
+                    <input type="text" id="full_name" name="full_name" required 
+                           value="Janine Amairani Aguilar Mendoza">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required 
+                           value="javierro23b@gmail.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Teléfono *</label>
+                    <input type="tel" id="phone" name="phone" required value="5512345678">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Dirección *</label>
+                    <input type="text" id="address" name="address" required value="Av. Principal 123">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">Ciudad *</label>
+                        <input type="text" id="city" name="city" required value="Ciudad de México">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="state">Estado *</label>
+                        <input type="text" id="state" name="state" required value="CDMX">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="zip_code">Código Postal *</label>
+                        <input type="text" id="zip_code" name="zip_code" required value="12345">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="country">País *</label>
+                        <select id="country" name="country" required>
+                            <option value="México" selected>México</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            <!-- MÉTODO DE PAGO -->
+            <h2>Método de Pago</h2>
+            
+            <!-- CONTENEDOR DE PAYPAL -->
+            <div id="paypal-button-container" style="min-height: 55px; margin: 20px 0;">
+                <p style="color: #666; text-align: center; padding: 20px;">
+                    
+                </p>
+            </div>
+            
+            <div class="payment-separator">
+                <span>o</span>
+            </div>
+            
+            <!-- BOTÓN DE PAGO SIMULADO -->
+            <form action="{{ url_for('simulate_payment') }}" method="POST">
+                <!-- Campos ocultos con los datos del formulario -->
+                <input type="hidden" name="full_name" id="hidden_full_name">
+                <input type="hidden" name="email" id="hidden_email">
+                <input type="hidden" name="phone" id="hidden_phone">
+                <input type="hidden" name="address" id="hidden_address">
+                <input type="hidden" name="city" id="hidden_city">
+                <input type="hidden" name="state" id="hidden_state">
+                <input type="hidden" name="zip_code" id="hidden_zip_code">
+                <input type="hidden" name="country" id="hidden_country">
+                
+                <button type="submit" class="btn-test-payment" onclick="setHiddenFields()">
+                    💳 Pago Simulado (Para pruebas)
+                </button>
+            </form>
+            <p class="payment-note">Usa esta opción para testing sin procesar pago real</p>
+        </div>
+
+        <!-- RESUMEN DEL PEDIDO -->
+        <div class="order-summary">
+            <h2>Resumen del Pedido</h2>
+            <div class="summary-items">
+                {% for item in cart_items %}
+                <div class="summary-item">
+                    <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" width="50">
+                    <div class="item-info">
+                        <h4>{{ item.product.name }}</h4>
+                        <p>Cantidad: {{ item.quantity }}</p>
+                    </div>
+                    <span class="item-price">${{ "%.2f"|format(item.total) }} MXN</span>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="summary-totals">
+                <div class="total-line">
+                    <span>Subtotal:</span>
+                    <span>${{ "%.2f"|format(subtotal) }} MXN</span>
+                </div>
+                <div class="total-line">
+                    <span>Impuestos (16%):</span>
+                    <span>${{ "%.2f"|format(tax) }} MXN</span>
+                </div>
+                <div class="total-line">
+                    <span>Envío:</span>
+                    <span>${{ "%.2f"|format(shipping) }} MXN</span>
+                </div>
+                <div class="total-line grand-total">
+                    <span>Total:</span>
+                    <span>${{ "%.2f"|format(total) }} MXN</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <p>Tu carrito está vacío</p>
+        <a href="{{ url_for('products') }}" class="btn-primary">Seguir comprando</a>
+    </div>
+    {% endif %}
+</section>
+
+<!-- SDK de PayPal - CONFIGURADO PARA MXN -->
+{% if config.PAYPAL_CLIENT_ID %}
+<script src="https://www.paypal.com/sdk/js?client-id={{ config.PAYPAL_CLIENT_ID }}&currency=MXN&locale=es_MX"></script>
+<script>
+// Función para llenar los campos ocultos del formulario de pago simulado
+function setHiddenFields() {
+    document.getElementById('hidden_full_name').value = document.getElementById('full_name').value;
+    document.getElementById('hidden_email').value = document.getElementById('email').value;
+    document.getElementById('hidden_phone').value = document.getElementById('phone').value;
+    document.getElementById('hidden_address').value = document.getElementById('address').value;
+    document.getElementById('hidden_city').value = document.getElementById('city').value;
+    document.getElementById('hidden_state').value = document.getElementById('state').value;
+    document.getElementById('hidden_zip_code').value = document.getElementById('zip_code').value;
+    document.getElementById('hidden_country').value = document.getElementById('country').value;
+}
+
+// Inicializar botones de PayPal
+paypal.Buttons({
+    style: {
+        layout: 'vertical',
+        color: 'blue',
+        shape: 'rect',
+        label: 'paypal'
+    },
+
+    // Crear orden
+    createOrder: function(data, actions) {
+        return fetch('/create-paypal-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(function(res) {
+            return res.json();
+        })
+        .then(function(data) {
+            if (data.id) {
+                return data.id;
+            } else {
+                throw new Error(data.error || 'Error creando orden');
+            }
+        });
+    },
+
+    // Capturar el pago
+    onApprove: function(data, actions) {
+        return fetch('/capture-paypal-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                orderID: data.orderID
+            })
+        })
+        .then(function(res) {
+            return res.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                window.location.href = '/order-confirmation';
+            } else {
+                throw new Error(data.error || 'Error capturando pago');
+            }
+        });
+    },
+
+    onError: function(err) {
+        console.error('Error PayPal:', err);
+        alert('Error en el proceso de pago: ' + err.message);
+    }
+
+}).render('#paypal-button-container');
+</script>
+{% else %}
+<script>
+console.error('ERROR: PAYPAL_CLIENT_ID no está configurado');
+document.getElementById('paypal-button-container').innerHTML = 
+    '<p style="color: red; text-align: center; padding: 20px;">Error: Configuración de PayPal no disponible</p>';
+</script>
+{% endif %}
+
+<style>
+.checkout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.checkout-content {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.checkout-form-section {
+    flex: 1;
+    min-width: 300px;
+}
+
+.order-summary {
+    flex: 0 0 350px;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.payment-separator {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.payment-separator span {
+    background: white;
+    padding: 0 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.payment-separator:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: #ddd;
+    z-index: 0;
+}
+
+.btn-test-payment {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+.btn-test-payment:hover {
+    background: #5a6268;
+}
+
+.payment-note {
+    margin-top: 8px;
+    color: #666;
+    text-align: center;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-item img {
+    border-radius: 4px;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-info h4 {
+    margin: 0 0 5px 0;
+}
+
+.item-price {
+    font-weight: bold;
+}
+
+.summary-totals {
+    margin-top: 20px;
+    border-top: 2px solid #ddd;
+    padding-top: 15px;
+}
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.grand-total {
+    font-size: 1.2em;
+    font-weight: bold;
+    border-top: 2px solid #ddd;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 40px;
+}
+
+@media (max-width: 768px) {
+    .checkout-content {
+        flex-direction: column;
+    }
+    
+    .order-summary {
+        flex: 1;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+</style>
+{% endblock %}

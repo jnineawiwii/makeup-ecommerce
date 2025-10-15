@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="payment-success-container">
+    <div class="payment-success">
+        <div class="success-icon">✓</div>
+        <h1>¡Pago Exitoso!</h1>
+        <p>Tu orden ha sido procesada correctamente. Te hemos enviado un email con los detalles de tu compra.</p>
+        <p>Número de orden: #{{ range(1000, 9999) | random }}</p>
+        
+        <div class="success-actions">
+            <a href="{{ url_for('products') }}" class="btn-primary">Seguir Comprando</a>
+            <a href="{{ url_for('index') }}" class="btn-secondary">Volver al Inicio</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

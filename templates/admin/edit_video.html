@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>Editar Video: {{ video.title }}</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Título del Video:</label>
+            <input type="text" id="title" name="title" value="{{ video.title }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" rows="4">{{ video.description }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="video_file">Nuevo Video:</label>
+            <input type="file" id="video_file" name="video_file" accept="video/*">
+            <small>Dejar vacío para mantener el video actual</small>
+            {% if video.file_name %}
+            <p class="current-file">Video actual: {{ video.file_name }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="url">URL de Video (YouTube/Vimeo):</label>
+            <input type="url" id="url" name="url" value="{{ video.url }}" placeholder="https://youtube.com/embed/...">
+            <small>Opcional: Si prefieres usar un video embebido</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="category">Categoría:</label>
+            <input type="text" id="category" name="category" value="{{ video.category }}" placeholder="Tutorial, Review, Demo...">
+        </div>
+        
+        <div class="form-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="is_featured" name="is_featured" {% if video.is_featured %}checked{% endif %}>
+                <span class="checkmark"></span>
+                Video destacado (aparecerá en la página principal)
+            </label>
+        </div>
+        
+        {% if video.file_path %}
+        <div class="video-preview">
+            <h4>Vista previa del video actual:</h4>
+            <video controls style="width: 100%; border-radius: 8px;">
+                <source src="{{ video.file_path }}" type="video/mp4">
+                Tu navegador no soporta el elemento de video.
+            </video>
+        </div>
+        {% endif %}
+        
+        <button type="submit" class="btn btn-primary">Actualizar Video</button>
+        <a href="{{ url_for('admin_videos') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+<style>
+.current-file {
+    background: #e3f2fd;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #1976d2;
+}
+
+.video-preview {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.video-preview h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+</style>
+
+<!-- Incluir los mismos estilos que add_video.html -->
+{% endblock %}
