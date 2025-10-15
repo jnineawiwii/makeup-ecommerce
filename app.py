@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from models import db, Product, User, Cart, CartItem, Order, OrderItem, Video, Venta
 from werkzeug.security import generate_password_hash, check_password_hash
-from dotenv import load_dotenv
+
 from functools import wraps
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -46,7 +46,23 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 # Cargar variables de entorno
-load_dotenv()
+def load_environment():
+    try:
+        # Solo cargar .env si existe (desarrollo local)
+        if os.path.exists('.env'):
+            with open('.env', 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, value = line.split('=', 1)
+                        os.environ.setdefault(key, value)
+            print("✅ Variables cargadas desde .env")
+        else:
+            print("🌐 Usando variables de entorno del sistema")
+    except Exception as e:
+        print(f"⚠️ Error cargando entorno: {e}")
+
+load_environment()
 
 # Configuración de PayPal
 PAYPAL_CLIENT_ID = app.config['PAYPAL_CLIENT_ID']
@@ -977,4 +993,4 @@ def add_header(response):
     return response
 
 if __name__ == '__main__':
-    app.run(port=5001, debug=True)
+    app.run(debug=False, host='0.0.0.0', port=5000)
