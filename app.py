@@ -955,14 +955,20 @@ def admin_delete_user(user_id):
         flash(f'Error al eliminar usuario: {str(e)}', 'danger')
     
     return redirect(url_for('admin_users'))
+
 @app.route('/debug-productos')
 def debug_productos():
-    from models import Product  # Ajusta según tu modelo
     try:
+        from models import Product
         productos = Product.query.all()
-        return f"Total productos en BD: {len(productos)}"
+        resultado = f"Total productos en BD: {len(productos)}<br><br>"
+        
+        for i, p in enumerate(productos):
+            resultado += f"Producto {i+1}: {p.nombre} - ${p.precio}<br>"
+        
+        return resultado
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error al consultar productos: {str(e)}"
 
 
 @app.route('/create-tables')
@@ -973,6 +979,8 @@ def create_tables():
         return {'status': '✅ Tablas creadas exitosamente'}
     except Exception as e:
         return {'status': '❌ Error', 'error': str(e)}, 500
+
+        
 
 # Inicialización de base de datos
 @app.route('/init_db')
@@ -999,6 +1007,108 @@ def init_db():
             db.session.rollback()
             return f'❌ Error al inicializar base de datos: {str(e)}'
 
+# MANTÉN ESTA RUTA (es importante para las tablas y usuarios)
+@app.route('/init_db')
+def init_db():
+    with app.app_context():
+        try:
+            db.create_all()
+            
+            if User.query.count() == 0:
+                master_admin = User(username='master_admin', email='master@example.com', role='master_admin')
+                master_admin.set_password('master123')
+                db.session.add(master_admin)
+                
+                admin_user = User(username='admin', email='admin@example.com', role='admin')
+                admin_user.set_password('admin123')
+                db.session.add(admin_user)
+                
+                print("✅ Usuarios administradores creados")
+            
+            db.session.commit()
+            return '✅ Base de datos inicializada correctamente'
+            
+        except Exception as e:
+            db.session.rollback()
+            return f'❌ Error al inicializar base de datos: {str(e)}'
+
+# === AGREGA ESTAS NUEVAS RUTAS DESPUÉS ===
+
+@app.route('/debug-productos')
+def debug_productos():
+    try:
+        from models import Product
+        productos = Product.query.all()
+        resultado = f"Total productos en BD: {len(productos)}<br><br>"
+        
+        for i, p in enumerate(productos):
+            resultado += f"Producto {i+1}: {p.nombre} - ${p.precio} - {p.categoria}<br>"
+        
+        return resultado
+    except Exception as e:
+        return f"Error al consultar productos: {str(e)}"
+
+@app.route('/add-sample-products')
+def add_sample_products():
+    try:
+        from models import Product, db
+        
+        # Verificar si ya hay productos
+        if Product.query.count() == 0:
+            # Agregar productos de prueba
+            productos_ejemplo = [
+                Product(
+                    nombre="Labial MAC Rojo", 
+                    precio=25.99, 
+                    categoria="labios", 
+                    imagen="/static/images/labial1.jpg",
+                    descripcion="Labial de larga duración color rojo intenso",
+                    stock=10
+                ),
+                Product(
+                    nombre="Paleta de Sombras", 
+                    precio=32.50, 
+                    categoria="ojos", 
+                    imagen="/static/images/sombras1.jpg",
+                    descripcion="Paleta profesional con 12 colores",
+                    stock=15
+                ),
+                Product(
+                    nombre="Base Líquida Natural", 
+                    precio=28.75, 
+                    categoria="rostro", 
+                    imagen="/static/images/base1.jpg",
+                    descripcion="Base de cobertura media para todo tipo de piel",
+                    stock=8
+                ),
+                Product(
+                    nombre="Gloss Brillante", 
+                    precio=18.99, 
+                    categoria="labios", 
+                    imagen="/static/images/gloss1.jpg",
+                    descripcion="Gloss labial con efecto brillo",
+                    stock=12
+                )
+            ]
+            
+            db.session.bulk_save_objects(productos_ejemplo)
+            db.session.commit()
+            return "✅ Productos de ejemplo agregados (4 productos)<br><a href='/debug-productos'>Ver productos</a> | <a href='/'>Ir a página principal</a>"
+        else:
+            return f"✅ Ya existen {Product.query.count()} productos en la BD<br><a href='/debug-productos'>Ver productos</a> | <a href='/'>Ir a página principal</a>"
+            
+    except Exception as e:
+        return f"❌ Error al agregar productos: {str(e)}"
+
+@app.route('/debug-routes')
+def debug_routes():
+    """Muestra todas las rutas disponibles"""
+    routes = []
+    for rule in app.url_map.iter_rules():
+        if 'static' not in rule.rule:
+            routes.append(f"{rule.endpoint}: {rule.rule}")
+    return "<br>".join(sorted(routes))
+    
 # Manejo de errores
 @app.errorhandler(404)
 def page_not_found(e):
