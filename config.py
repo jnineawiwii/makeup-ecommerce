@@ -1,20 +1,24 @@
 import os
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'una-clave-secreta-muy-segura'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'clave-temporal-makeup-ecommerce'
     
-    # ✅ DEBE USAR POSTGRESQL DE RAILWAY
-    DATABASE_URL = os.environ.get('DATABASE_URL', '')
+    # ✅ USA LA DATABASE_URL DE RAILWAY
+    DATABASE_URL = os.environ.get('DATABASE_URL')
     
     if DATABASE_URL:
-        SQLALCHEMY_DATABASE_URI = DATABASE_URL.replace('postgres://', 'postgresql://')
+        # Convierte postgres:// a postgresql:// si es necesario
+        if DATABASE_URL.startswith('postgres://'):
+            SQLALCHEMY_DATABASE_URI = DATABASE_URL.replace('postgres://', 'postgresql://')
+        else:
+            SQLALCHEMY_DATABASE_URI = DATABASE_URL
         print("✅ Conectado a PostgreSQL de Railway")
     else:
-        # ❌ NO usar SQLite - esto causa el error
-        raise ValueError("❌ DATABASE_URL no encontrada. Verifica que PostgreSQL esté conectado en Railway")
+        raise ValueError("❌ DATABASE_URL no encontrada")
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
+    # Configuración PayPal
     PAYPAL_MODE = os.environ.get('PAYPAL_MODE', 'sandbox')
     PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', '')
     PAYPAL_CLIENT_SECRET = os.environ.get('PAYPAL_CLIENT_SECRET', '')
