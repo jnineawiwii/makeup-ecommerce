@@ -126,7 +126,7 @@ def get_paypal_access_token():
 @app.route('/')
 def index():
     try:
-        featured_products = Product.query.filter_by(featured=True).limit(6).all()
+        featured_products = Product.query.filter(Product.featured == True).limit(6).all()
         featured_video = Video.query.filter_by(is_featured=True).first()
         other_videos = Video.query.filter_by(is_featured=False).limit(4).all()
         
@@ -965,7 +965,31 @@ def admin_delete_user(user_id):
     
     return redirect(url_for('admin_users'))
 
-
+@app.route('/fix-featured-products')
+def fix_featured_products():
+    try:
+        # Forzar que todos los productos con featured=true se muestren
+        featured_products = Product.query.filter(Product.featured == True).limit(6).all()
+        
+        resultado = f"<h1>Productos con featured (FIX): {len(featured_products)}</h1>"
+        
+        for i, p in enumerate(featured_products):
+            resultado += f"""
+            <div style='border: 1px solid green; margin: 10px; padding: 10px; background: #f0fff0;'>
+                <strong>✅ Producto {i+1}:</strong><br>
+                ID: {p.id}<br>
+                Nombre: {p.nombre}<br>
+                Precio: ${p.price}<br>
+                Categoría: {p.category}<br>
+                Stock: {p.stock}<br>
+                Featured: {p.featured}<br>
+                Image: {p.image_url}
+            </div>
+            """
+        
+        return resultado
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 @app.route('/create-tables')
 def create_tables():
