@@ -126,10 +126,25 @@ def get_paypal_access_token():
 @app.route('/')
 def index():
     try:
-        return "✅ La aplicación funciona - Ruta principal básica"
-    except Exception as e:
-        return f"Error simple: {str(e)}"
+        featured_products = Product.query.filter_by(featured=True).limit(6).all()
+        featured_video = Video.query.filter_by(is_featured=True).first()
+        other_videos = Video.query.filter_by(is_featured=False).limit(4).all()
         
+        print(f"🔍 Productos destacados encontrados: {len(featured_products)}")
+        
+        return render_template(
+            'index.html',
+            featured_products=featured_products,
+            featured_video=featured_video,
+            other_videos=other_videos
+        )
+    except Exception as e:
+        return f"""
+        <h1>Error en la página principal</h1>
+        <p><strong>Error:</strong> {str(e)}</p>
+        <p>Por favor revisa los logs para más detalles.</p>
+        """
+
 @app.route('/test')
 def test():
     return "✅ Aplicación funcionando correctamente"
@@ -957,7 +972,18 @@ def create_tables():
     except Exception as e:
         return {'status': '❌ Error', 'error': str(e)}, 500
 
+@app.route('/debug-productos')
+def debug_productos():
+    try:
+        productos = Product.query.all()
+        resultado = f"<h1>Productos en la BD: {len(productos)}</h1><br>"
         
+        for i, p in enumerate(productos):
+            resultado += f"Producto {i+1}: {p.nombre} - ${p.price} - {p.category}<br>"
+        
+        return resultado
+    except Exception as e:
+        return f"Error al consultar productos: {str(e)}"      
 """
 # Inicialización de base de datos
 @app.route('/init_db')
