@@ -3,7 +3,7 @@ import os
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'clave-temporal-makeup-ecommerce'
     
-    # ✅ USA LA DATABASE_URL DE RAILWAY
+    # ✅ VERIFICACIÓN SEGURA - Sin bloquear el inicio
     DATABASE_URL = os.environ.get('DATABASE_URL')
     
     if DATABASE_URL:
@@ -14,7 +14,9 @@ class Config:
             SQLALCHEMY_DATABASE_URI = DATABASE_URL
         print("✅ Conectado a PostgreSQL de Railway")
     else:
-        raise ValueError("❌ DATABASE_URL no encontrada")
+        # ⚠️ TEMPORAL: Usar SQLite para diagnóstico
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///makeup.db'
+        print("⚠️  Usando SQLite temporal para diagnóstico")
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
