@@ -880,6 +880,8 @@ def init_db():
             db.session.rollback()
             return f'❌ Error al inicializar base de datos: {str(e)}'
 
+            
+
 # Manejo de errores
 @app.errorhandler(404)
 def page_not_found(e):
@@ -887,14 +889,14 @@ def page_not_found(e):
 
 @app.route('/check-database')
 def check_database():
-    import sqlalchemy
     try:
-        # Intentar conectar a la base de datos
+        # Verificar conexión a la base de datos
         with app.app_context():
             db.engine.connect()
             return {
                 'status': '✅ CONEXIÓN EXITOSA A POSTGRESQL',
-                'database_url': app.config['SQLALCHEMY_DATABASE_URI'][:50] + '...'  # Mostrar solo parte por seguridad
+                'database_engine': str(db.engine.url)[:50] + '...',  # Mostrar parte de la URL
+                'message': 'La base de datos está funcionando correctamente'
             }
     except Exception as e:
         return {
@@ -902,6 +904,15 @@ def check_database():
             'error': str(e),
             'database_url': app.config.get('SQLALCHEMY_DATABASE_URI', 'No configurada')
         }, 500
+
+@app.route('/health')
+def health():
+    """Ruta simple de verificación"""
+    return {
+        'status': '✅ OK',
+        'message': 'La aplicación está ejecutándose',
+        'database': 'PostgreSQL' if 'postgresql' in app.config.get('SQLALCHEMY_DATABASE_URI', '') else 'SQLite'
+    }        
 
 @app.errorhandler(500)
 def internal_error(e):
