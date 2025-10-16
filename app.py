@@ -14,24 +14,22 @@ import json
 import os
 import traceback
 
-
 # Importar configuración desde config.py
 from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# ✅ DIAGNÓSTICO DE VARIABLES - Agrega esto
+# ✅ DIAGNÓSTICO DE VARIABLES
 print("🔍 DIAGNÓSTICO DE VARIABLES:")
 print(f"DATABASE_URL en entorno: {'DATABASE_URL' in os.environ}")
 if 'DATABASE_URL' in os.environ:
     db_url = os.environ['DATABASE_URL']
-    print(f"DATABASE_URL: {db_url[:50]}...")  # Mostrar solo parte por seguridad
+    print(f"DATABASE_URL: {db_url[:50]}...")
 else:
     print("❌ DATABASE_URL NO ENCONTRADA en variables de entorno")
     print("Variables disponibles:", list(os.environ.keys()))
 
-app.config.from_object(Config)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['VIDEO_UPLOAD_FOLDER'] = 'static/videos'
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
@@ -57,8 +55,6 @@ login_manager.login_view = 'login'
 
 # Importar db después de crear app para evitar importación circular
 from models import db, Product, User, Cart, CartItem, Order, OrderItem, Video, Venta
-
-
 
 # Cargar variables de entorno
 def load_environment():
@@ -122,67 +118,7 @@ def get_paypal_access_token():
     except Exception as e:
         print(f"Error obteniendo token PayPal: {e}")
         return None
-@app.route('/init-database')
-def init_database():
-    """Inicializar base de datos con tablas y datos básicos"""
-    try:
-        with app.app_context():
-            # Crear todas las tablas
-            db.create_all()
-            
-            # Crear usuario administrador si no existe
-            if not User.query.filter_by(username='master_admin').first():
-                master_admin = User(
-                    username='master_admin', 
-                    email='admin@makeup.com', 
-                    role='master_admin'
-                )
-                master_admin.set_password('admin123')
-                db.session.add(master_admin)
-            
-            if not User.query.filter_by(username='admin').first():
-                admin_user = User(
-                    username='admin', 
-                    email='admin2@makeup.com', 
-                    role='admin'
-                )
-                admin_user.set_password('admin123')
-                db.session.add(admin_user)
-            
-            # Crear algunos productos de ejemplo si no existen
-            if Product.query.count() == 0:
-                sample_products = [
-                    Product(
-                        name='Labial Rojo', 
-                        description='Labial de larga duración color rojo intenso',
-                        price=250.00, 
-                        category='labiales',
-                        stock=10,
-                        image_url=''
-                    ),
-                    Product(
-                        name='Sombras Nude', 
-                        description='Paleta de sombras en tonos nude',
-                        price=450.00, 
-                        category='ojos',
-                        stock=15,
-                        image_url=''
-                    )
-                ]
-                db.session.add_all(sample_products)
-            
-            db.session.commit()
-            
-            return {
-                'status': '✅ Base de datos inicializada',
-                'tablas_creadas': True,
-                'usuarios_creados': User.query.count(),
-                'productos_creados': Product.query.count()
-            }
-            
-    except Exception as e:
-        db.session.rollback()
-        return {'status': '❌ Error', 'error': str(e)}, 500
+
 # RUTAS DE PRUEBA PARA DIAGNÓSTICO
 @app.route('/')
 def index():
@@ -224,6 +160,100 @@ def test_db():
         <p><strong>Error:</strong> {str(e)}</p>
         <pre>{traceback.format_exc()}</pre>
         """
+
+@app.route('/health')
+def health():
+    """Ruta simple de verificación"""
+    return {
+        'status': '✅ OK',
+        'message': 'La aplicación está ejecutándose',
+        'database': 'PostgreSQL' if 'postgresql' in app.config.get('SQLALCHEMY_DATABASE_URI', '') else 'SQLite'
+    }
+
+@app.route('/check-database')
+def check_database():
+    try:
+        # Verificar conexión a la base de datos
+        with app.app_context():
+            db.engine.connect()
+            return {
+                'status': '✅ CONEXIÓN EXITOSA A POSTGRESQL',
+                'database_engine': str(db.engine.url)[:50] + '...',
+                'message': 'La base de datos está funcionando correctamente'
+            }
+    except Exception as e:
+        return {
+            'status': '❌ ERROR DE CONEXIÓN',
+            'error': str(e),
+            'database_url': app.config.get('SQLALCHEMY_DATABASE_URI', 'No configurada')
+        }, 500
+
+@app.route('/init-database')
+def init_database():
+    """Inicializar base de datos con tablas y datos básicos"""
+    try:
+        with app.app_context():
+            # Crear todas las tablas
+            db.create_all()
+            print("✅ Tablas creadas en PostgreSQL")
+            
+            # Crear usuario administrador si no existe
+            if not User.query.filter_by(username='master_admin').first():
+                master_admin = User(
+                    username='master_admin', 
+                    email='admin@makeup.com', 
+                    role='master_admin'
+                )
+                master_admin.set_password('admin123')
+                db.session.add(master_admin)
+                print("✅ Usuario master_admin creado")
+            
+            if not User.query.filter_by(username='admin').first():
+                admin_user = User(
+                    username='admin', 
+                    email='admin2@makeup.com', 
+                    role='admin'
+                )
+                admin_user.set_password('admin123')
+                db.session.add(admin_user)
+                print("✅ Usuario admin creado")
+            
+            # Crear algunos productos de ejemplo si no existen
+            if Product.query.count() == 0:
+                sample_products = [
+                    Product(
+                        name='Labial Rojo', 
+                        description='Labial de larga duración color rojo intenso',
+                        price=250.00, 
+                        category='labiales',
+                        stock=10,
+                        image_url=''
+                    ),
+                    Product(
+                        name='Sombras Nude', 
+                        description='Paleta de sombras en tonos nude',
+                        price=450.00, 
+                        category='ojos',
+                        stock=15,
+                        image_url=''
+                    )
+                ]
+                db.session.add_all(sample_products)
+                print("✅ Productos de ejemplo creados")
+            
+            db.session.commit()
+            
+            return {
+                'status': '✅ Base de datos inicializada',
+                'tablas_creadas': True,
+                'usuarios_creados': User.query.count(),
+                'productos_creados': Product.query.count()
+            }
+            
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error inicializando BD: {e}")
+        return {'status': '❌ Error', 'error': str(e)}, 500
 
 # Ruta de búsqueda
 @app.route('/search')
@@ -579,7 +609,6 @@ def admin_dashboard():
         return f"Error en dashboard admin: {str(e)}"
 
 # 🎯 RUTAS DE ADMINISTRACIÓN FALTANTES
-
 @app.route('/admin/videos')
 @admin_required
 def admin_videos():
@@ -961,41 +990,10 @@ def init_db():
             db.session.rollback()
             return f'❌ Error al inicializar base de datos: {str(e)}'
 
-# ✅ MUEVE ESTAS RUTAS AQUÍ - ANTES del manejo de errores
-@app.route('/health')
-def health():
-    """Ruta simple de verificación"""
-    return {
-        'status': '✅ OK',
-        'message': 'La aplicación está ejecutándose',
-        'database': 'PostgreSQL' if 'postgresql' in app.config.get('SQLALCHEMY_DATABASE_URI', '') else 'SQLite'
-    }
-
-@app.route('/check-database')
-def check_database():
-    try:
-        # Verificar conexión a la base de datos
-        with app.app_context():
-            db.engine.connect()
-            return {
-                'status': '✅ CONEXIÓN EXITOSA A POSTGRESQL',
-                'database_engine': str(db.engine.url)[:50] + '...',
-                'message': 'La base de datos está funcionando correctamente'
-            }
-    except Exception as e:
-        return {
-            'status': '❌ ERROR DE CONEXIÓN',
-            'error': str(e),
-            'database_url': app.config.get('SQLALCHEMY_DATABASE_URI', 'No configurada')
-        }, 500            
-
 # Manejo de errores
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('error.html'), 404
-
-
-
 
 @app.errorhandler(500)
 def internal_error(e):
@@ -1012,7 +1010,7 @@ def add_header(response):
     response.headers['Expires'] = '-1'
     return response
 
-# ... todo tu código anterior ...
+# ✅ INICIALIZACIÓN DE LA BASE DE DATOS AL FINAL
 db.init_app(app)
 migrate = Migrate(app, db)
 
@@ -1023,8 +1021,6 @@ with app.app_context():
         print("✅ Tablas verificadas/creadas en PostgreSQL")
     except Exception as e:
         print(f"❌ Error creando tablas: {e}")
-
-  
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)), debug=True)
