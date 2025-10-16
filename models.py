@@ -80,6 +80,9 @@ class CartItem(db.Model):
     quantity = db.Column(db.Integer, default=1)
     added_at = db.Column(db.DateTime, default=datetime.utcnow)
     
+    # ✅ AGREGAR ESTA RELACIÓN (FALTANTE)
+    product = db.relationship('Product', backref='cart_items')
+    
     def __repr__(self):
         return f'<CartItem Cart {self.cart_id} - Product {self.product_id}>'
 
