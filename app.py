@@ -618,7 +618,7 @@ def admin_add_user():
             db.session.rollback()
             flash(f'Error al agregar usuario: {str(e)}', 'danger')
     
-    return render_template('admin/add_user.html')        
+    return render_template('admin/add_user.html')
 
 @app.route('/admin/products')
 @admin_required
@@ -628,6 +628,232 @@ def admin_products():
         return render_template('admin/products.html', products=products)
     except Exception as e:
         return f"Error cargando productos admin: {str(e)}"
+
+# 🎯 RUTAS CRÍTICAS FALTANTES - AGREGAR PRODUCTO
+@app.route('/admin/product/add', methods=['GET', 'POST'])
+@admin_required
+def admin_add_product():
+    """Agregar producto - RUTA CRÍTICA FALTANTE"""
+    if request.method == 'POST':
+        try:
+            # Procesar la imagen
+            image_filename = None
+            if 'image' in request.files:
+                file = request.files['image']
+                if file and file.filename != '' and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}"
+                    filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                    file.save(filepath)
+                    
+                    # Redimensionar si es necesario
+                    try:
+                        img = Image.open(filepath)
+                        if img.width > 800 or img.height > 800:
+                            img.thumbnail((800, 800))
+                            img.save(filepath)
+                    except:
+                        pass
+                    
+                    image_filename = f"/static/uploads/{unique_filename}"
+            
+            # Crear el producto
+            new_product = Product(
+                name=request.form['name'],
+                description=request.form['description'],
+                price=float(request.form['price']),
+                category=request.form['category'],
+                image_url=image_filename if image_filename else '',
+                stock=int(request.form['stock'])
+            )
+            
+            db.session.add(new_product)
+            db.session.commit()
+            flash('Producto agregado exitosamente', 'success')
+            return redirect(url_for('admin_products'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al agregar producto: {str(e)}', 'danger')
+    
+    return render_template('admin/agregar.html')
+
+@app.route('/admin/product/edit/<int:product_id>', methods=['GET', 'POST'])
+@admin_required
+def admin_edit_product(product_id):
+    """Editar producto - RUTA FALTANTE"""
+    product = Product.query.get_or_404(product_id)
+    
+    if request.method == 'POST':
+        try:
+            # Procesar nueva imagen si se subió
+            if 'image' in request.files:
+                file = request.files['image']
+                if file and file.filename != '' and allowed_file(file.filename):
+                    # Eliminar imagen anterior si existe
+                    if product.image_url and product.image_url.startswith('/static/uploads/'):
+                        old_image_path = product.image_url.replace('/static/', '')
+                        if os.path.exists(old_image_path):
+                            os.remove(old_image_path)
+                    
+                    # Guardar nueva imagen
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}"
+                    filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                    file.save(filepath)
+                    
+                    # Redimensionar si es necesario
+                    try:
+                        img = Image.open(filepath)
+                        if img.width > 800 or img.height > 800:
+                            img.thumbnail((800, 800))
+                            img.save(filepath)
+                    except:
+                        pass
+                    
+                    product.image_url = f"/static/uploads/{unique_filename}"
+            
+            # Actualizar otros campos
+            product.name = request.form['name']
+            product.description = request.form['description']
+            product.price = float(request.form['price'])
+            product.category = request.form['category']
+            product.stock = int(request.form['stock'])
+            
+            db.session.commit()
+            flash('Producto actualizado exitosamente', 'success')
+            return redirect(url_for('admin_products'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al actualizar producto: {str(e)}', 'danger')
+    
+    return render_template('admin/edit_product.html', product=product)
+
+@app.route('/admin/product/delete/<int:product_id>', methods=['POST'])
+@admin_required
+def admin_delete_product(product_id):
+    """Eliminar producto - RUTA FALTANTE"""
+    try:
+        product = Product.query.get_or_404(product_id)
+        db.session.delete(product)
+        db.session.commit()
+        flash('Producto eliminado exitosamente', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al eliminar producto: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin_products'))
+
+@app.route('/admin/video/edit/<int:video_id>', methods=['GET', 'POST'])
+@admin_required
+def admin_edit_video(video_id):
+    """Editar video - RUTA FALTANTE"""
+    video = Video.query.get_or_404(video_id)
+    
+    if request.method == 'POST':
+        try:
+            # Procesar nuevo archivo de video si se subió
+            if 'video_file' in request.files:
+                file = request.files['video_file']
+                if file and file.filename != '' and allowed_video_file(file.filename):
+                    # Eliminar video anterior si existe
+                    if video.file_path:
+                        old_video_path = os.path.join('static', video.file_path)
+                        if os.path.exists(old_video_path):
+                            os.remove(old_video_path)
+                    
+                    # Guardar nuevo video
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}"
+                    filepath = os.path.join(app.config['VIDEO_UPLOAD_FOLDER'], unique_filename)
+                    file.save(filepath)
+                    
+                    video.file_path = f"videos/{unique_filename}"
+                    video.url = None
+            
+            # Actualizar otros campos
+            video.title = request.form['title']
+            video.description = request.form['description']
+            video.category = request.form['category']
+            video.is_featured = 'is_featured' in request.form
+            
+            db.session.commit()
+            flash('Video actualizado exitosamente', 'success')
+            return redirect(url_for('admin_videos'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al actualizar video: {str(e)}', 'danger')
+    
+    return render_template('admin/edit_video.html', video=video)
+
+@app.route('/admin/video/delete/<int:video_id>', methods=['POST'])
+@admin_required
+def admin_delete_video(video_id):
+    """Eliminar video - RUTA FALTANTE"""
+    try:
+        video = Video.query.get_or_404(video_id)
+        
+        # Eliminar archivo si existe
+        if video.file_path:
+            video_path = os.path.join('static', video.file_path)
+            if os.path.exists(video_path):
+                os.remove(video_path)
+        
+        db.session.delete(video)
+        db.session.commit()
+        flash('Video eliminado exitosamente', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al eliminar video: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin_videos'))
+
+@app.route('/admin/user/edit/<int:user_id>', methods=['GET', 'POST'])
+@admin_required
+def admin_edit_user(user_id):
+    """Editar usuario - RUTA FALTANTE"""
+    user = User.query.get_or_404(user_id)
+    
+    if request.method == 'POST':
+        try:
+            user.username = request.form['username']
+            user.email = request.form['email']
+            user.role = request.form['role']
+            
+            if request.form['password']:
+                user.set_password(request.form['password'])
+            
+            db.session.commit()
+            flash('Usuario actualizado exitosamente', 'success')
+            return redirect(url_for('admin_users'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al actualizar usuario: {str(e)}', 'danger')
+    
+    return render_template('admin/edit_user.html', user=user)
+
+@app.route('/admin/user/delete/<int:user_id>', methods=['POST'])
+@admin_required
+def admin_delete_user(user_id):
+    """Eliminar usuario - RUTA FALTANTE"""
+    try:
+        user = User.query.get_or_404(user_id)
+        
+        # No permitir eliminarse a sí mismo
+        if user.id == current_user.id:
+            flash('No puedes eliminar tu propio usuario', 'danger')
+            return redirect(url_for('admin_users'))
+        
+        db.session.delete(user)
+        db.session.commit()
+        flash('Usuario eliminado exitosamente', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al eliminar usuario: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin_users'))
 
 # Inicialización de base de datos
 @app.route('/init_db')
