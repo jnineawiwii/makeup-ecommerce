@@ -30,7 +30,7 @@ if 'DATABASE_URL' in os.environ:
 else:
     print("❌ DATABASE_URL NO ENCONTRADA en variables de entorno")
     print("Variables disponibles:", list(os.environ.keys()))
-    
+
 app.config.from_object(Config)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['VIDEO_UPLOAD_FOLDER'] = 'static/videos'
@@ -58,7 +58,7 @@ login_manager.login_view = 'login'
 # Importar db después de crear app para evitar importación circular
 from models import db, Product, User, Cart, CartItem, Order, OrderItem, Video, Venta
 
-db.init_app(app)
+#db.init_app(app)
 migrate = Migrate(app, db)
 
 # Cargar variables de entorno
