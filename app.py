@@ -130,7 +130,11 @@ def index():
         featured_video = Video.query.filter_by(is_featured=True).first()
         other_videos = Video.query.filter_by(is_featured=False).limit(4).all()
         
-        print(f"🔍 Productos destacados encontrados: {len(featured_products)}")
+        print(f"🔍 Página principal - Productos destacados encontrados: {len(featured_products)}")
+        
+        # DEBUG: Imprimir los productos que se están enviando a la plantilla
+        for i, p in enumerate(featured_products):
+            print(f"   Producto {i+1}: {p.nombre} - ${p.price} - {p.category}")
         
         return render_template(
             'index.html',
@@ -142,7 +146,7 @@ def index():
         return f"""
         <h1>Error en la página principal</h1>
         <p><strong>Error:</strong> {str(e)}</p>
-        <p>Por favor revisa los logs para más detalles.</p>
+        <pre>{traceback.format_exc()}</pre>
         """
 
 @app.route('/test')
@@ -1044,6 +1048,36 @@ def add_sample_products():
     except Exception as e:
         db.session.rollback()
         return f"❌ Error al agregar productos: {str(e)}"        
+
+@app.route('/debug-featured-products')
+def debug_featured_products():
+    try:
+        # Verificar qué productos tienen featured=true
+        featured_products = Product.query.filter_by(featured=True).all()
+        
+        resultado = f"<h1>Productos con featured=True: {len(featured_products)}</h1>"
+        
+        for i, p in enumerate(featured_products):
+            resultado += f"""
+            <div style='border: 1px solid green; margin: 10px; padding: 10px; background: #f0fff0;'>
+                <strong>✅ Producto {i+1}:</strong><br>
+                ID: {p.id}<br>
+                Nombre: {p.nombre}<br>
+                Precio: ${p.price}<br>
+                Categoría: {p.category}<br>
+                Stock: {p.stock}<br>
+                Featured: {p.featured}<br>
+                Image: {p.image_url}
+            </div>
+            """
+        
+        # También verificar la consulta exacta que usa tu página principal
+        resultado += f"<h2>Consulta SQL:</h2>"
+        resultado += f"<code>Product.query.filter_by(featured=True).limit(6).all()</code>"
+        
+        return resultado
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 @app.route('/debug-productos')
 def debug_productos():
