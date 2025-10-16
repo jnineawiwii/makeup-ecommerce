@@ -1120,13 +1120,8 @@ def restore_my_products():
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
-@app.route('/check-database-url')
-def check_database_url():
-    return f"""
-    <h1>Configuración de BD</h1>
-    <p>DATABASE_URL: {app.config.get('SQLALCHEMY_DATABASE_URI', 'No configurada')}</p>
-    <p>¿Usando PostgreSQL?: {'postgresql' in app.config.get('SQLALCHEMY_DATABASE_URI', '')}</p>
-    """                
+
+                
 
 @app.route('/debug-featured-products')
 def debug_featured_products():
