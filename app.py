@@ -122,7 +122,67 @@ def get_paypal_access_token():
     except Exception as e:
         print(f"Error obteniendo token PayPal: {e}")
         return None
-
+@app.route('/init-database')
+def init_database():
+    """Inicializar base de datos con tablas y datos básicos"""
+    try:
+        with app.app_context():
+            # Crear todas las tablas
+            db.create_all()
+            
+            # Crear usuario administrador si no existe
+            if not User.query.filter_by(username='master_admin').first():
+                master_admin = User(
+                    username='master_admin', 
+                    email='admin@makeup.com', 
+                    role='master_admin'
+                )
+                master_admin.set_password('admin123')
+                db.session.add(master_admin)
+            
+            if not User.query.filter_by(username='admin').first():
+                admin_user = User(
+                    username='admin', 
+                    email='admin2@makeup.com', 
+                    role='admin'
+                )
+                admin_user.set_password('admin123')
+                db.session.add(admin_user)
+            
+            # Crear algunos productos de ejemplo si no existen
+            if Product.query.count() == 0:
+                sample_products = [
+                    Product(
+                        name='Labial Rojo', 
+                        description='Labial de larga duración color rojo intenso',
+                        price=250.00, 
+                        category='labiales',
+                        stock=10,
+                        image_url=''
+                    ),
+                    Product(
+                        name='Sombras Nude', 
+                        description='Paleta de sombras en tonos nude',
+                        price=450.00, 
+                        category='ojos',
+                        stock=15,
+                        image_url=''
+                    )
+                ]
+                db.session.add_all(sample_products)
+            
+            db.session.commit()
+            
+            return {
+                'status': '✅ Base de datos inicializada',
+                'tablas_creadas': True,
+                'usuarios_creados': User.query.count(),
+                'productos_creados': Product.query.count()
+            }
+            
+    except Exception as e:
+        db.session.rollback()
+        return {'status': '❌ Error', 'error': str(e)}, 500
 # RUTAS DE PRUEBA PARA DIAGNÓSTICO
 @app.route('/')
 def index():
