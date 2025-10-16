@@ -22,3 +22,4 @@ requests==2.32.3
 SQLAlchemy==2.0.39
 Werkzeug==2.3.7
 WTForms==3.0.0
+gunicorn==21.2.0
