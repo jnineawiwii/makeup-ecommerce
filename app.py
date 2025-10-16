@@ -134,7 +134,7 @@ def index():
         
         # DEBUG: Imprimir los productos que se están enviando a la plantilla
         for i, p in enumerate(featured_products):
-            print(f"   Producto {i+1}: {p.nombre} - ${p.price} - {p.category}")
+            print(f"   Producto {i+1}: {p.name} - ${p.price} - {p.category}")
         
         return render_template(
             'index.html',
@@ -1047,7 +1047,7 @@ def fix_featured_products():
             <div style='border: 1px solid green; margin: 10px; padding: 10px; background: #f0fff0;'>
                 <strong>✅ Producto {i+1}:</strong><br>
                 ID: {p.id}<br>
-                Nombre: {p.nombre}<br>
+                Nombre: {p.name}<br>
                 Precio: ${p.price}<br>
                 Categoría: {p.category}<br>
                 Stock: {p.stock}<br>
@@ -1136,7 +1136,7 @@ def debug_featured_products():
             <div style='border: 1px solid green; margin: 10px; padding: 10px; background: #f0fff0;'>
                 <strong>✅ Producto {i+1}:</strong><br>
                 ID: {p.id}<br>
-                Nombre: {p.nombre}<br>
+                Nombre: {p.name}<br>
                 Precio: ${p.price}<br>
                 Categoría: {p.category}<br>
                 Stock: {p.stock}<br>
@@ -1160,7 +1160,7 @@ def debug_productos():
         resultado = f"<h1>Productos en la BD: {len(productos)}</h1><br>"
         
         for i, p in enumerate(productos):
-            resultado += f"Producto {i+1}: {p.nombre} - ${p.price} - {p.category}<br>"
+            resultado += f"Producto {i+1}: {p.name} - ${p.price} - {p.category}<br>"
         
         return resultado
     except Exception as e:
