@@ -968,7 +968,7 @@ def create_tables():
         return {'status': '❌ Error', 'error': str(e)}, 500
 
         
-
+"""
 # Inicialización de base de datos
 @app.route('/init_db')
 def init_db():
@@ -1064,7 +1064,7 @@ def add_sample_products():
             
     except Exception as e:
         return f"❌ Error al agregar productos: {str(e)}"
-
+"""
 @app.route('/debug-routes')
 def debug_routes():
     """Muestra todas las rutas disponibles"""
