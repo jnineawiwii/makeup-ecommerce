@@ -1008,29 +1008,7 @@ def init_db():
             return f'❌ Error al inicializar base de datos: {str(e)}'
 
 # MANTÉN ESTA RUTA (es importante para las tablas y usuarios)
-@app.route('/init_db')
-def init_db():
-    with app.app_context():
-        try:
-            db.create_all()
-            
-            if User.query.count() == 0:
-                master_admin = User(username='master_admin', email='master@example.com', role='master_admin')
-                master_admin.set_password('master123')
-                db.session.add(master_admin)
-                
-                admin_user = User(username='admin', email='admin@example.com', role='admin')
-                admin_user.set_password('admin123')
-                db.session.add(admin_user)
-                
-                print("✅ Usuarios administradores creados")
-            
-            db.session.commit()
-            return '✅ Base de datos inicializada correctamente'
-            
-        except Exception as e:
-            db.session.rollback()
-            return f'❌ Error al inicializar base de datos: {str(e)}'
+
 
 # === AGREGA ESTAS NUEVAS RUTAS DESPUÉS ===
 
@@ -1108,7 +1086,7 @@ def debug_routes():
         if 'static' not in rule.rule:
             routes.append(f"{rule.endpoint}: {rule.rule}")
     return "<br>".join(sorted(routes))
-    
+
 # Manejo de errores
 @app.errorhandler(404)
 def page_not_found(e):
