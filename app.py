@@ -867,6 +867,15 @@ def admin_delete_user(user_id):
         flash(f'Error al eliminar usuario: {str(e)}', 'danger')
     
     return redirect(url_for('admin_users'))
+    
+@app.route('/create-tables')
+def create_tables():
+    try:
+        with app.app_context():
+            db.create_all()
+        return {'status': '✅ Tablas creadas exitosamente'}
+    except Exception as e:
+        return {'status': '❌ Error', 'error': str(e)}, 500
 
 # Inicialización de base de datos
 @app.route('/init_db')
@@ -943,6 +952,18 @@ def add_header(response):
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '-1'
     return response
+
+# ... todo tu código anterior ...
+
+# ✅ CREAR TABLAS SI NO EXISTEN
+with app.app_context():
+    try:
+        db.create_all()
+        print("✅ Tablas verificadas/creadas en PostgreSQL")
+    except Exception as e:
+        print(f"❌ Error creando tablas: {e}")
+
+  
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)), debug=True)
