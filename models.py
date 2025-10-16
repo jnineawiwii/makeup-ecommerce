@@ -39,7 +39,7 @@ class Product(db.Model):
     __tablename__ = 'products'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    nombre = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     price = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(50), nullable=False)
@@ -48,10 +48,10 @@ class Product(db.Model):
     featured = db.Column(db.Boolean, default=False)  
     
     # Agregar índices para búsqueda
-    __table_args__ = (
-        db.Index('ix_product_name', 'name'),
+        __table_args__ = (
+        db.Index('ix_product_nombre', 'nombre'),  # ✅ Cambiar name por nombre
         db.Index('ix_product_category', 'category'),
-        db.Index('ix_product_name_desc', 'name', 'description'),
+        db.Index('ix_product_nombre_desc', 'nombre', 'description'),  # ✅ Cambiar aquí también
     )
     
     # Relaciones
@@ -60,7 +60,7 @@ class Product(db.Model):
     ventas = db.relationship('Venta', backref='producto_rel', lazy=True, foreign_keys='Venta.producto_id')
     
     def __repr__(self):
-        return f'<Product {self.name}>'
+        return f'<Product {self.nombre}>'
 
 class Cart(db.Model):
     __tablename__ = 'carts'
