@@ -3,15 +3,25 @@ import os
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'clave-temporal-makeup-ecommerce'
     
-    # ✅ CONEXIÓN DIRECTA A POSTGRESQL
-    DATABASE_URL = os.environ.get('DATABASE_URL')
+    # ✅ USAR LAS VARIABLES INDIVIDUALES DE RAILWAY
+    db_host = os.environ.get('PGHOST')
+    db_port = os.environ.get('PGPORT')
+    db_name = os.environ.get('PGDATABASE')
+    db_user = os.environ.get('PGUSER')
+    db_password = os.environ.get('PGPASSWORD')
     
-    if DATABASE_URL and DATABASE_URL.startswith('postgresql://'):
-        SQLALCHEMY_DATABASE_URI = DATABASE_URL
-        print("✅ CONECTADO A POSTGRESQL DE RAILWAY")
+    if all([db_host, db_port, db_name, db_user, db_password]):
+        SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        print("✅ CONECTADO A POSTGRESQL DE RAILWAY (variables individuales)")
     else:
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///makeup.db'
-        print("⚠️  USANDO SQLITE TEMPORAL")
+        # Fallback a DATABASE_URL directa
+        DATABASE_URL = os.environ.get('DATABASE_URL')
+        if DATABASE_URL and DATABASE_URL.startswith('postgresql://'):
+            SQLALCHEMY_DATABASE_URI = DATABASE_URL
+            print("✅ CONECTADO A POSTGRESQL DE RAILWAY (URL directa)")
+        else:
+            SQLALCHEMY_DATABASE_URI = 'sqlite:///makeup.db'
+            print("⚠️  USANDO SQLITE TEMPORAL")
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
