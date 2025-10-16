@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import jsonify
 from functools import wraps
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -20,15 +19,16 @@ from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# ✅ DIAGNÓSTICO DE VARIABLES
-print("🔍 DIAGNÓSTICO DE VARIABLES:")
-print(f"DATABASE_URL en entorno: {'DATABASE_URL' in os.environ}")
-if 'DATABASE_URL' in os.environ:
-    db_url = os.environ['DATABASE_URL']
-    print(f"DATABASE_URL: {db_url[:50]}...")
-else:
-    print("❌ DATABASE_URL NO ENCONTRADA en variables de entorno")
-    print("Variables disponibles:", list(os.environ.keys()))
+# ✅ INICIALIZAR DB PRIMERO - CORREGIDO
+from models import db
+db.init_app(app)
+migrate = Migrate(app, db)
+
+# ✅ DIAGNÓSTICO
+print("🔍 DIAGNÓSTICO DE PLANTILLAS:")
+print(f"Directorio actual: {os.getcwd()}")
+print(f"¿Existe templates/? {os.path.exists('templates')}")
+print(f"¿Existe templates/login.html? {os.path.exists('templates/login.html')}")
 
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['VIDEO_UPLOAD_FOLDER'] = 'static/videos'
@@ -53,8 +53,8 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Importar db después de crear app para evitar importación circular
-from models import db, Product, User, Cart, CartItem, Order, OrderItem, Video, Venta
+# ✅ IMPORTAR MODELOS DESPUÉS DE INICIALIZAR DB
+from models import Product, User, Cart, CartItem, Order, OrderItem, Video, Venta
 
 # Cargar variables de entorno
 def load_environment():
@@ -1010,10 +1010,6 @@ def add_header(response):
     response.headers['Expires'] = '-1'
     return response
 
-# ✅ INICIALIZACIÓN DE LA BASE DE DATOS AL FINAL
-db.init_app(app)
-migrate = Migrate(app, db)
-
 # ✅ CREAR TABLAS SI NO EXISTEN
 with app.app_context():
     try:
@@ -1023,4 +1019,4 @@ with app.app_context():
         print(f"❌ Error creando tablas: {e}")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)), debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)), debug=False)
