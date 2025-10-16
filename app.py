@@ -885,6 +885,24 @@ def init_db():
 def page_not_found(e):
     return render_template('error.html'), 404
 
+@app.route('/check-database')
+def check_database():
+    import sqlalchemy
+    try:
+        # Intentar conectar a la base de datos
+        with app.app_context():
+            db.engine.connect()
+            return {
+                'status': '✅ CONEXIÓN EXITOSA A POSTGRESQL',
+                'database_url': app.config['SQLALCHEMY_DATABASE_URI'][:50] + '...'  # Mostrar solo parte por seguridad
+            }
+    except Exception as e:
+        return {
+            'status': '❌ ERROR DE CONEXIÓN',
+            'error': str(e),
+            'database_url': app.config.get('SQLALCHEMY_DATABASE_URI', 'No configurada')
+        }, 500
+
 @app.errorhandler(500)
 def internal_error(e):
     return f"""
