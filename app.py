@@ -1012,6 +1012,14 @@ def debug_database_connection():
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
+@app.route('/check-database-url')
+def check_database_url():
+    return f"""
+    <h1>Configuración de BD</h1>
+    <p>DATABASE_URL: {app.config.get('SQLALCHEMY_DATABASE_URI', 'No configurada')}</p>
+    <p>¿Usando PostgreSQL?: {'postgresql' in app.config.get('SQLALCHEMY_DATABASE_URI', '')}</p>
+    """        
+
 @app.route('/debug-model-error')
 def debug_model_error():
     try:
@@ -1061,78 +1069,64 @@ def create_tables():
     except Exception as e:
         return {'status': '❌ Error', 'error': str(e)}, 500
 
-@app.route('/add-sample-products')
-def add_sample_products():
+@app.route('/restore-my-products')
+def restore_my_products():
     try:
-        # Verificar si ya hay productos
-        if Product.query.count() == 0:
-            # Agregar productos de prueba
-            productos_ejemplo = [
-                Product(
-                    nombre="Labial MAC Rojo Intenso",
-                    description="Labial de larga duración color rojo intenso mate",
-                    price=25.99,
-                    category="labios",
-                    image_url="/static/images/labial1.jpg",
-                    stock=15,
-                    featured=True
-                ),
-                Product(
-                    nombre="Paleta de Sombras Profesional",
-                    description="Paleta con 12 colores mate y brillo para looks profesionales",
-                    price=32.50,
-                    category="ojos", 
-                    image_url="/static/images/sombras1.jpg",
-                    stock=10,
-                    featured=True
-                ),
-                Product(
-                    nombre="Base Líquida Natural",
-                    description="Base de cobertura media para todo tipo de piel",
-                    price=28.75,
-                    category="rostro",
-                    image_url="/static/images/base1.jpg", 
-                    stock=8,
-                    featured=True
-                ),
-                Product(
-                    nombre="Gloss Brillante Transparente",
-                    description="Gloss labial con efecto brillo y hidratación",
-                    price=18.99,
-                    category="labios",
-                    image_url="/static/images/gloss1.jpg",
-                    stock=12,
-                    featured=True
-                ),
-                Product(
-                    nombre="Rubor en Polvo",
-                    description="Rubor en polvo con acabado natural y duradero",
-                    price=22.50,
-                    category="rostro",
-                    image_url="/static/images/rubor1.jpg",
-                    stock=6,
-                    featured=True
-                ),
-                Product(
-                    nombre="Máscara de Pestañas",
-                    description="Máscara de pestañas volumen extremo a prueba de agua",
-                    price=19.99,
-                    category="ojos",
-                    image_url="/static/images/mascara1.jpg",
-                    stock=20,
-                    featured=True
-                )
-            ]
-            
-            db.session.bulk_save_objects(productos_ejemplo)
-            db.session.commit()
-            return "✅ 6 productos de prueba agregados a la base de datos<br><a href='/'>Ver página principal</a> | <a href='/debug-productos'>Ver productos</a>"
-        else:
-            return f"✅ Ya existen {Product.query.count()} productos en la BD<br><a href='/'>Ver página principal</a>"
-            
+        # TUS PRODUCTOS ORIGINALES
+        mis_productos = [
+            Product(
+                name="Labial Mate Ruby Woo",
+                description="Labial de larga duración color rojo intenso",
+                price=5.00,
+                category="labios", 
+                image_url="/static/images/labial2.png",
+                stock=2,
+                featured=True
+            ),
+            Product(
+                name="Base Studio Fix Fluid", 
+                description="Base de cobertura media a completa",
+                price=12.00,
+                category="rostro",
+                image_url="/static/uploads/20250912_160045_basemac.jpg", 
+                stock=30,
+                featured=True
+            ),
+            Product(
+                name="Sombra de Ojos",
+                description="Paleta de sombras con 9 tonos neutros", 
+                price=8.00,
+                category="ojos",
+                image_url="/static/uploads/20250912_160100_sombras.png",
+                stock=10,
+                featured=True
+            ),
+            Product(
+                name="base",
+                description="base de alta cobertura",
+                price=223.00,
+                category="labios",
+                image_url="/static/uploads/20250922_204131_basemac.jpg", 
+                stock=34,
+                featured=False
+            )
+        ]
+        
+        db.session.bulk_save_objects(mis_productos)
+        db.session.commit()
+        
+        return "✅ Tus 4 productos originales restaurados<br><a href='/debug-productos'>Ver productos</a> | <a href='/'>Ir a página principal</a>"
+        
     except Exception as e:
-        db.session.rollback()
-        return f"❌ Error al agregar productos: {str(e)}"        
+        return f"❌ Error: {str(e)}"
+
+@app.route('/check-database-url')
+def check_database_url():
+    return f"""
+    <h1>Configuración de BD</h1>
+    <p>DATABASE_URL: {app.config.get('SQLALCHEMY_DATABASE_URI', 'No configurada')}</p>
+    <p>¿Usando PostgreSQL?: {'postgresql' in app.config.get('SQLALCHEMY_DATABASE_URI', '')}</p>
+    """                
 
 @app.route('/debug-featured-products')
 def debug_featured_products():
