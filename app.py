@@ -955,6 +955,15 @@ def admin_delete_user(user_id):
         flash(f'Error al eliminar usuario: {str(e)}', 'danger')
     
     return redirect(url_for('admin_users'))
+@app.route('/debug-productos')
+def debug_productos():
+    from models import Product  # Ajusta según tu modelo
+    try:
+        productos = Product.query.all()
+        return f"Total productos en BD: {len(productos)}"
+    except Exception as e:
+        return f"Error: {str(e)}"
+
 
 @app.route('/create-tables')
 def create_tables():
