@@ -4,19 +4,26 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'clave-temporal-makeup-ecommerce'
     
     # ✅ VERIFICACIÓN SEGURA - Sin bloquear el inicio
-    DATABASE_URL = os.environ.get('DATABASE_URL')
-    
-    if DATABASE_URL:
-        # Convierte postgres:// a postgresql:// si es necesario
-        if DATABASE_URL.startswith('postgres://'):
-            SQLALCHEMY_DATABASE_URI = DATABASE_URL.replace('postgres://', 'postgresql://')
-        else:
-            SQLALCHEMY_DATABASE_URI = DATABASE_URL
-        print("✅ Conectado a PostgreSQL de Railway")
+   # ✅ FORZAR DETECCIÓN DE DATABASE_URL
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+print("🔍 CONFIGURACIÓN DE BASE DE DATOS:")
+print(f"DATABASE_URL encontrada: {bool(DATABASE_URL)}")
+
+if DATABASE_URL:
+    # Asegurar formato postgresql://
+    if DATABASE_URL.startswith('postgres://'):
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL.replace('postgres://', 'postgresql://')
     else:
-        # ⚠️ TEMPORAL: Usar SQLite para diagnóstico
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///makeup.db'
-        print("⚠️  Usando SQLite temporal para diagnóstico")
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    print("✅ CONECTADO A POSTGRESQL DE RAILWAY")
+else:
+    # ❌ ERROR CRÍTICO - No usar SQLite
+    print("❌ ERROR: DATABASE_URL no encontrada")
+    print("Variables de entorno disponibles:", [k for k in os.environ.keys() if 'DATABASE' in k or 'POSTGRES' in k])
+    # Usar SQLite temporalmente pero con advertencia clara
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///makeup.db'
+    print("⚠️  ⚠️  ⚠️  USANDO SQLITE TEMPORAL - CONFIGURAR DATABASE_URL")
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     

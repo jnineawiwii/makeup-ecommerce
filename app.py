@@ -20,6 +20,18 @@ from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# ✅ DIAGNÓSTICO DE VARIABLES - Agrega esto
+print("🔍 DIAGNÓSTICO DE VARIABLES:")
+print(f"DATABASE_URL en entorno: {'DATABASE_URL' in os.environ}")
+if 'DATABASE_URL' in os.environ:
+    db_url = os.environ['DATABASE_URL']
+    print(f"DATABASE_URL: {db_url[:50]}...")  # Mostrar solo parte por seguridad
+else:
+    print("❌ DATABASE_URL NO ENCONTRADA en variables de entorno")
+    print("Variables disponibles:", list(os.environ.keys()))
+    
+app.config.from_object(Config)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['VIDEO_UPLOAD_FOLDER'] = 'static/videos'
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
