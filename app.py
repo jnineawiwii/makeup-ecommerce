@@ -126,23 +126,10 @@ def get_paypal_access_token():
 @app.route('/')
 def index():
     try:
-        featured_products = Product.query.filter_by(featured=True).limit(6).all()
-        featured_video = Video.query.filter_by(is_featured=True).first()
-        other_videos = Video.query.filter_by(is_featured=False).limit(4).all()
-        
-        return render_template(
-            'index.html',
-            featured_products=featured_products,
-            featured_video=featured_video,
-            other_videos=other_videos
-        )
+        return "✅ La aplicación funciona - Ruta principal básica"
     except Exception as e:
-        return f"""
-        <h1>Error en la página principal</h1>
-        <p><strong>Error:</strong> {str(e)}</p>
-        <p>Por favor revisa los logs para más detalles.</p>
-        """
-
+        return f"Error simple: {str(e)}"
+        
 @app.route('/test')
 def test():
     return "✅ Aplicación funcionando correctamente"
