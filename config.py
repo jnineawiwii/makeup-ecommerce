@@ -3,14 +3,17 @@ import os
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'una-clave-secreta-muy-segura'
     
-    # ✅ USAR SOLO DATABASE_URL DE RAILWAY
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', '').replace(
-        'postgres://', 'postgresql://'
-    )
+    # ✅ USAR LA DATABASE_URL DE RAILWAY
+    DATABASE_URL = os.environ.get('DATABASE_URL', '')
     
-    # ✅ Si no hay DATABASE_URL, mostrar error claro
-    if not SQLALCHEMY_DATABASE_URI:
-        raise ValueError("❌ DATABASE_URL no está configurada en Railway")
+    if DATABASE_URL:
+        # Railway proporciona DATABASE_URL - úsala
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+        print("✅ Usando PostgreSQL de Railway")
+    else:
+        # Fallback para desarrollo
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///temp.db'
+        print("⚠️ Usando SQLite temporal")
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
