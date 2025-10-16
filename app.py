@@ -1059,15 +1059,48 @@ def fix_featured_products():
         return resultado
     except Exception as e:
         return f"Error: {str(e)}"
+@app.route('/add-sample-products')
+def add_sample_products():
+    from app import db, Product
+    
+    sample_products = [
+        Product(name="Labial Rojo Mate", price=25.99, category="labios", description="Labial mate color rojo intenso", image_url="/static/images/labial-rojo.jpg"),
+        Product(name="Paleta Sombras Nude", price=35.50, category="ojos", description="Paleta de sombras en tonos nude", image_url="/static/images/sombras-nude.jpg"),
+        Product(name="Base Líquida Cover", price=42.00, category="rostro", description="Base de cobertura media", image_url="/static/images/base-liquida.jpg"),
+        Product(name="Máscara de Pestañas", price=18.75, category="ojos", description="Máscara volumen extra", image_url="/static/images/mascara-pestanas.jpg"),
+        Product(name="Rubor en Polvo", price=28.30, category="rostro", description="Rubor mate color melocotón", image_url="/static/images/rubor-polvo.jpg"),
+        Product(name="Delineador Líquido", price=22.50, category="ojos", description="Delineador de precisión negro", image_url="/static/images/delineador.jpg")
+    ]
+    
+    for product in sample_products:
+        db.session.add(product)
+    
+    db.session.commit()
+    
+    # Verificar que se guardaron
+    product_count = Product.query.count()
+    return f"<h1>✅ {len(sample_products)} productos de ejemplo agregados</h1><p>Total en base de datos: {product_count} productos</p>"
 
-@app.route('/create-tables')
-def create_tables():
+@app.route('/check-products')
+def check_products():
+    from app import Product
     try:
-        with app.app_context():
-            db.create_all()
-        return {'status': '✅ Tablas creadas exitosamente'}
+        products = Product.query.all()
+        result = f"<h1>Productos en la base de datos: {len(products)}</h1>"
+        
+        for p in products:
+            result += f"""
+            <div style='border: 1px solid #ccc; margin: 10px; padding: 10px;'>
+                <h3>{p.name}</h3>
+                <p>Precio: ${p.price}</p>
+                <p>Categoría: {p.category}</p>
+                <p>Descripción: {p.description}</p>
+            </div>
+            """
+        
+        return result
     except Exception as e:
-        return {'status': '❌ Error', 'error': str(e)}, 500
+        return f"<h1>❌ Error leyendo productos:</h1><p>{str(e)}</p>"
 
 @app.route('/restore-my-products')
 def restore_my_products():
@@ -1152,6 +1185,22 @@ def debug_featured_products():
         return resultado
     except Exception as e:
         return f"Error: {str(e)}"
+
+@app.route('/create-tables')
+def create_tables():
+    from app import db
+    try:
+        db.create_all()
+        return """
+        <h1>✅ Tablas creadas en PostgreSQL</h1>
+        <p>Ahora puedes:</p>
+        <ol>
+            <li><a href="/add-sample-products">Agregar productos de ejemplo</a></li>
+            <li><a href="/">Ver la página principal</a></li>
+        </ol>
+        """
+    except Exception as e:
+        return f"<h1>❌ Error creando tablas:</h1><p>{str(e)}</p>"
 
 @app.route('/debug-productos')
 def debug_productos():
