@@ -58,8 +58,7 @@ login_manager.login_view = 'login'
 # Importar db después de crear app para evitar importación circular
 from models import db, Product, User, Cart, CartItem, Order, OrderItem, Video, Venta
 
-#db.init_app(app)
-migrate = Migrate(app, db)
+
 
 # Cargar variables de entorno
 def load_environment():
@@ -867,7 +866,7 @@ def admin_delete_user(user_id):
         flash(f'Error al eliminar usuario: {str(e)}', 'danger')
     
     return redirect(url_for('admin_users'))
-    
+
 @app.route('/create-tables')
 def create_tables():
     try:
@@ -954,6 +953,8 @@ def add_header(response):
     return response
 
 # ... todo tu código anterior ...
+db.init_app(app)
+migrate = Migrate(app, db)
 
 # ✅ CREAR TABLAS SI NO EXISTEN
 with app.app_context():
