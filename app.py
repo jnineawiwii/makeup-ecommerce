@@ -1,6 +1,8 @@
 import random
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from models import db, User, Product, Video, Order, OrderItem 
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -12,6 +14,7 @@ import base64
 import json
 import os
 import traceback
+
 
 # Importar configuración desde config.py
 from config import Config
@@ -137,7 +140,7 @@ def index():
         return f"""
         <h1>Error en la página principal</h1>
         <p><strong>Error:</strong> {str(e)}</p>
-        <pre>{traceback.format_exc()}</pre>
+        <p>Por favor revisa los logs para más detalles.</p>
         """
 
 @app.route('/test')
