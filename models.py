@@ -39,28 +39,23 @@ class Product(db.Model):
     __tablename__ = 'products'
     
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False)  # ✅ VOLVER A name
     description = db.Column(db.Text, nullable=False)
     price = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(50), nullable=False)
     image_url = db.Column(db.String(200), nullable=True, default='')
     stock = db.Column(db.Integer, default=0)
-    featured = db.Column(db.Boolean, default=False)  
+    featured = db.Column(db.Boolean, default=False)
     
-    # Agregar índices para búsqueda
-    __table_args__ = (  # ✅ SIN indentación extra
-        db.Index('ix_product_nombre', 'nombre'),
+    # Actualizar índices también
+    __table_args__ = (
+        db.Index('ix_product_name', 'name'),  # ✅ VOLVER A name
         db.Index('ix_product_category', 'category'),
-        db.Index('ix_product_nombre_desc', 'nombre', 'description'),
+        db.Index('ix_product_name_desc', 'name', 'description'),  # ✅ VOLVER A name
     )
     
-    # Relaciones
-    cart_items = db.relationship('CartItem', backref='product', lazy=True)
-    order_items = db.relationship('OrderItem', backref='product', lazy=True)
-    ventas = db.relationship('Venta', backref='producto_rel', lazy=True, foreign_keys='Venta.producto_id')
-    
     def __repr__(self):
-        return f'<Product {self.nombre}>'
+        return f'<Product {self.name}>'  # ✅ VOLVER A name
 
 class Cart(db.Model):
     __tablename__ = 'carts'
