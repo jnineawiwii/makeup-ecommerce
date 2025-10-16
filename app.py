@@ -956,19 +956,6 @@ def admin_delete_user(user_id):
     
     return redirect(url_for('admin_users'))
 
-@app.route('/debug-productos')
-def debug_productos():
-    try:
-        from models import Product
-        productos = Product.query.all()
-        resultado = f"Total productos en BD: {len(productos)}<br><br>"
-        
-        for i, p in enumerate(productos):
-            resultado += f"Producto {i+1}: {p.nombre} - ${p.precio}<br>"
-        
-        return resultado
-    except Exception as e:
-        return f"Error al consultar productos: {str(e)}"
 
 
 @app.route('/create-tables')
