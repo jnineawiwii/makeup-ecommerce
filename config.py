@@ -3,16 +3,15 @@ import os
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'una-clave-secreta-muy-segura'
     
-    # ✅ AHORA SÍ HAY DATABASE_URL - USAR LA DE RAILWAY
+    # ✅ DEBE USAR POSTGRESQL DE RAILWAY
     DATABASE_URL = os.environ.get('DATABASE_URL', '')
     
     if DATABASE_URL:
         SQLALCHEMY_DATABASE_URI = DATABASE_URL.replace('postgres://', 'postgresql://')
         print("✅ Conectado a PostgreSQL de Railway")
     else:
-        # Fallback temporal
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///temp.db'
-        print("⚠️  Usando SQLite temporal")
+        # ❌ NO usar SQLite - esto causa el error
+        raise ValueError("❌ DATABASE_URL no encontrada. Verifica que PostgreSQL esté conectado en Railway")
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
