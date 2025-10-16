@@ -48,10 +48,10 @@ class Product(db.Model):
     featured = db.Column(db.Boolean, default=False)  
     
     # Agregar índices para búsqueda
-        __table_args__ = (
-        db.Index('ix_product_nombre', 'nombre'),  # ✅ Cambiar name por nombre
+    __table_args__ = (  # ✅ SIN indentación extra
+        db.Index('ix_product_nombre', 'nombre'),
         db.Index('ix_product_category', 'category'),
-        db.Index('ix_product_nombre_desc', 'nombre', 'description'),  # ✅ Cambiar aquí también
+        db.Index('ix_product_nombre_desc', 'nombre', 'description'),
     )
     
     # Relaciones
