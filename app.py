@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from flask import jsonify
 from functools import wraps
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -13,6 +13,7 @@ import base64
 import json
 import os
 import traceback
+
 
 # Importar configuración desde config.py
 from config import Config
