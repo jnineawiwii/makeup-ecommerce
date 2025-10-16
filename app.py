@@ -1012,6 +1012,17 @@ def debug_database_connection():
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
+@app.route('/update-db-relations')
+def update_db_relations():
+    from app import db
+    try:
+        # Esto forzará la actualización de las relaciones
+        db.drop_all()
+        db.create_all()
+        return "<h1>✅ Base de datos actualizada con relaciones correctas</h1>"
+    except Exception as e:
+        return f"<h1>❌ Error actualizando BD:</h1><p>{str(e)}</p>"
+
 @app.route('/check-database-url')
 def check_database_url():
     return f"""
