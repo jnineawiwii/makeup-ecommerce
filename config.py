@@ -14,3 +14,7 @@ class Config:
         print("⚠️  USANDO SQLITE TEMPORAL")
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    PAYPAL_MODE = os.environ.get('PAYPAL_MODE', 'sandbox')
+    PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', '')
+    PAYPAL_CLIENT_SECRET = os.environ.get('PAYPAL_CLIENT_SECRET', '')
