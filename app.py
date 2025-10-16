@@ -506,6 +506,120 @@ def admin_dashboard():
     except Exception as e:
         return f"Error en dashboard admin: {str(e)}"
 
+# 🎯 RUTAS DE ADMINISTRACIÓN FALTANTES
+
+@app.route('/admin/videos')
+@admin_required
+def admin_videos():
+    """Gestión de videos"""
+    try:
+        videos = Video.query.all()
+        return render_template('admin/videos.html', videos=videos)
+    except Exception as e:
+        return f"Error cargando videos: {str(e)}"
+
+@app.route('/admin/ventas')
+@admin_required
+def admin_ventas():
+    """Gestión de ventas"""
+    try:
+        ventas = Venta.query.order_by(Venta.fecha.desc()).all()
+        total_general = sum(venta.producto.price * venta.cantidad for venta in ventas)
+        return render_template('admin/ventas.html', 
+                             ventas=ventas,
+                             total_general=total_general)
+    except Exception as e:
+        return f"Error cargando ventas: {str(e)}"
+
+@app.route('/admin/users')
+@admin_required
+def admin_users():
+    """Gestión de usuarios"""
+    try:
+        users = User.query.all()
+        return render_template('admin/users.html', users=users)
+    except Exception as e:
+        return f"Error cargando usuarios: {str(e)}"
+
+@app.route('/admin/videos/add', methods=['GET', 'POST'])
+@admin_required
+def admin_add_video():
+    """Agregar video"""
+    if request.method == 'POST':
+        try:
+            title = request.form['title']
+            description = request.form['description']
+            category = request.form['category']
+            is_featured = 'is_featured' in request.form
+            
+            file_path = None
+            if 'video_file' in request.files:
+                file = request.files['video_file']
+                if file and file.filename != '' and allowed_video_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}"
+                    file_path = os.path.join(app.config['VIDEO_UPLOAD_FOLDER'], unique_filename)
+                    file.save(file_path)
+                    file_path = f"videos/{unique_filename}"
+            
+            if not file_path:
+                flash('Debes subir un archivo de video', 'error')
+                return render_template('admin/add_video.html')
+            
+            new_video = Video(
+                title=title,
+                description=description,
+                category=category,
+                url=None,
+                file_path=file_path,
+                is_featured=is_featured,
+                created_at=datetime.utcnow()
+            )
+            
+            db.session.add(new_video)
+            db.session.commit()
+            flash('Video agregado correctamente', 'success')
+            return redirect(url_for('admin_videos'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al agregar video: {str(e)}', 'error')
+    
+    return render_template('admin/add_video.html')
+
+@app.route('/admin/user/add', methods=['GET', 'POST'])
+@admin_required
+def admin_add_user():
+    """Agregar usuario"""
+    if request.method == 'POST':
+        try:
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            role = request.form['role']
+            
+            if User.query.filter_by(username=username).first():
+                flash('El nombre de usuario ya existe', 'danger')
+                return redirect(url_for('admin_add_user'))
+            
+            if User.query.filter_by(email=email).first():
+                flash('El email ya está registrado', 'danger')
+                return redirect(url_for('admin_add_user'))
+            
+            new_user = User(username=username, email=email, role=role)
+            new_user.set_password(password)
+            
+            db.session.add(new_user)
+            db.session.commit()
+            
+            flash('Usuario agregado exitosamente', 'success')
+            return redirect(url_for('admin_users'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al agregar usuario: {str(e)}', 'danger')
+    
+    return render_template('admin/add_user.html')        
+
 @app.route('/admin/products')
 @admin_required
 def admin_products():
