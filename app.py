@@ -965,6 +965,67 @@ def admin_delete_user(user_id):
     
     return redirect(url_for('admin_users'))
 
+@app.route('/debug-database-connection')
+def debug_database_connection():
+    try:
+        # 1. Verificar conexión
+        db.engine.connect()
+        
+        # 2. Verificar tablas existentes
+        inspector = db.inspect(db.engine)
+        tablas = inspector.get_table_names()
+        
+        # 3. Verificar columnas de la tabla products
+        columnas = inspector.get_columns('products')
+        
+        resultado = f"""
+        <h1>🔍 Diagnóstico de Base de Datos</h1>
+        
+        <h2>✅ Conexión: OK</h2>
+        
+        <h2>📊 Tablas en la BD:</h2>
+        <ul>
+        """
+        for tabla in tablas:
+            resultado += f"<li>{tabla}</li>"
+        
+        resultado += "</ul>"
+        
+        resultado += "<h2>📋 Columnas de 'products':</h2><ul>"
+        for columna in columnas:
+            resultado += f"<li>{columna['name']} - {columna['type']}</li>"
+        resultado += "</ul>"
+        
+        # 4. Intentar consulta directa
+        resultado += "<h2>🔍 Consulta directa:</h2>"
+        with db.engine.connect() as conn:
+            productos_directo = conn.execute(db.text("SELECT * FROM products")).fetchall()
+            resultado += f"<p>Productos encontrados (consulta directa): {len(productos_directo)}</p>"
+            
+            for producto in productos_directo:
+                resultado += f"<div style='border:1px solid #ccc; margin:5px; padding:5px;'>"
+                resultado += f"ID: {producto.id} | Name: {producto.name} | Price: {producto.price}"
+                resultado += f" | Featured: {producto.featured}</div>"
+        
+        return resultado
+        
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+@app.route('/debug-model-error')
+def debug_model_error():
+    try:
+        # Intentar acceder a los productos
+        productos = Product.query.all()
+        return f"✅ Productos encontrados: {len(productos)}"
+    except Exception as e:
+        return f"""
+        <h1>❌ Error en el modelo</h1>
+        <p><strong>Error:</strong> {str(e)}</p>
+        <p>El problema es que el modelo busca 'nombre' pero la BD tiene 'name'</p>
+        """
+
+
 @app.route('/fix-featured-products')
 def fix_featured_products():
     try:
