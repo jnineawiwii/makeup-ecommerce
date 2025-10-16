@@ -896,7 +896,7 @@ def check_database():
             db.engine.connect()
             return {
                 'status': '✅ CONEXIÓN EXITOSA A POSTGRESQL',
-                'database_engine': str(db.engine.url)[:50] + '...',  # Mostrar parte de la URL
+                'database_engine': str(db.engine.url)[:50] + '...',
                 'message': 'La base de datos está funcionando correctamente'
             }
     except Exception as e:
@@ -913,8 +913,7 @@ def health():
         'status': '✅ OK',
         'message': 'La aplicación está ejecutándose',
         'database': 'PostgreSQL' if 'postgresql' in app.config.get('SQLALCHEMY_DATABASE_URI', '') else 'SQLite'
-    }        
-
+    }
 @app.errorhandler(500)
 def internal_error(e):
     return f"""
