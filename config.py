@@ -16,3 +16,5 @@ class Config:
     # ✅ CORREGIDO: Usar variables de entorno para credenciales seguras
     PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', 'AYujnXtepsxbrazDJZFCgbVpqiCNYfc5UalANOiFe6KKRUOxxLG0Ypr0Iy2orRpkOU75COKXs1cHDOSa')
     PAYPAL_CLIENT_SECRET = os.environ.get('PAYPAL_CLIENT_SECRET', 'EHRo6iJTv3DvibwMPN4MjQqRrEIrhzexYB9JoEBYFt2UB_o86dy9KVhOzMQkacNnzEtcU1N-0XnoQs3F')
+
+    
