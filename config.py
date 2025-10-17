@@ -3,20 +3,19 @@ import os
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'clave-temporal-makeup-ecommerce'
     
-    # ✅ CORREGIR: Railway usa 'postgres://' no 'postgresql://'
+    # Obtener DATABASE_URL de Railway
     DATABASE_URL = os.environ.get('DATABASE_URL')
     
     if DATABASE_URL:
-        # Railway usa 'postgres://' pero SQLAlchemy necesita 'postgresql://'
+        # Asegurar formato correcto para SQLAlchemy
         if DATABASE_URL.startswith('postgres://'):
             DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
-            print("✅ CONVERTIDO A POSTGRESQL PARA SQLALCHEMY")
+            print("✅ URL convertida a formato PostgreSQL")
         
         SQLALCHEMY_DATABASE_URI = DATABASE_URL
-        print("✅ CONECTADO A POSTGRESQL DE RAILWAY")
+        print(f"🎯 CONECTADO A: {DATABASE_URL.split('@')[1] if '@' in DATABASE_URL else DATABASE_URL}")
     else:
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///makeup.db'
-        print("⚠️  USANDO SQLITE TEMPORAL")
+        raise RuntimeError("🚫 DATABASE_URL no configurada en Railway")
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
