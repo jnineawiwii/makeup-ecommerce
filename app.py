@@ -127,9 +127,7 @@ def get_paypal_access_token():
 def health_check():
     return "✅ HEALTH CHECK - APP RUNNING", 200
 
-@app.route('/test-simple')
-def test_simple():
-    return "<h1>✅ TEST SIMPLE FUNCIONANDO</h1><p>La aplicación está activa</p>"
+
 
 
 @app.route('/')
@@ -1454,7 +1452,7 @@ def handle_all_errors(error):
     <h3>Traceback completo:</h3>
     <pre>{traceback.format_exc()}</pre>
     """, 500
-    
+
 # ✅ CREAR TABLAS SI NO EXISTEN
 with app.app_context():
     try:
