@@ -1038,7 +1038,7 @@ def test_simple():
     return "✅ TEST SIMPLE FUNCIONANDO"
 
 
- @app.route('/debug-config')
+@app.route('/debug-config')
 def debug_config():
     from flask import current_app
     import os
