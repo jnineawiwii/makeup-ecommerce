@@ -1038,27 +1038,23 @@ def test_simple():
     return "✅ TEST SIMPLE FUNCIONANDO"
 
 
-@app.errorhandler(500)
-def internal_error(error):
+ @app.route('/debug-config')
+def debug_config():
+    from flask import current_app
+    import os
+    
     return f"""
-    <h1>Error 500 - Error Interno del Servidor</h1>
-    <p><strong>Error:</strong> {str(error)}</p>
-    <p>Revisa los logs en Railway para más detalles.</p>
-    """, 500
-
-@app.errorhandler(404)
-def not_found(error):
-    return f"""
-    <h1>Error 404 - Página No Encontrada</h1>
-    <p>La ruta solicitada no existe.</p>
-    <p>Rutas disponibles:</p>
-    <ul>
-        <li><a href="/">/ (Página principal)</a></li>
-        <li><a href="/test-simple">/test-simple</a></li>
-        <li><a href="/db-info">/db-info</a></li>
-        <li><a href="/cart">/cart</a></li>
-    </ul>
-    """, 404    
+    <h1>Configuración Actual de la App</h1>
+    
+    <h2>Variables de Entorno:</h2>
+    <p>DATABASE_URL: {os.environ.get('DATABASE_URL', 'NO CONFIGURADA')}</p>
+    
+    <h2>Configuración Flask:</h2>
+    <p>SQLALCHEMY_DATABASE_URI: {current_app.config.get('SQLALCHEMY_DATABASE_URI')}</p>
+    
+    <h2>¿Usando PostgreSQL de Railway?</h2>
+    <p>{'SÍ' if 'railway' in str(current_app.config.get('SQLALCHEMY_DATABASE_URI')) else 'NO'}</p>
+    """   
 
 @app.route('/db-info')
 def db_info():
