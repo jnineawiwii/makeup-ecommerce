@@ -177,14 +177,7 @@ def test_db():
         <pre>{traceback.format_exc()}</pre>
         """
 
-@app.route('/health')
-def health():
-    """Ruta simple de verificación"""
-    return {
-        'status': '✅ OK',
-        'message': 'La aplicación está ejecutándose',
-        'database': 'PostgreSQL' if 'postgresql' in app.config.get('SQLALCHEMY_DATABASE_URI', '') else 'SQLite'
-    }
+
 
 @app.route('/check-database')
 def check_database():
