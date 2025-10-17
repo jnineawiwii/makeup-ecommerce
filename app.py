@@ -1032,6 +1032,34 @@ def db_connection_info():
         info = "<h1>DATABASE_URL no configurada</h1>"
     
     return info
+
+@app.route('/test-simple')
+def test_simple():
+    return "✅ TEST SIMPLE FUNCIONANDO"
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    return f"""
+    <h1>Error 500 - Error Interno del Servidor</h1>
+    <p><strong>Error:</strong> {str(error)}</p>
+    <p>Revisa los logs en Railway para más detalles.</p>
+    """, 500
+
+@app.errorhandler(404)
+def not_found(error):
+    return f"""
+    <h1>Error 404 - Página No Encontrada</h1>
+    <p>La ruta solicitada no existe.</p>
+    <p>Rutas disponibles:</p>
+    <ul>
+        <li><a href="/">/ (Página principal)</a></li>
+        <li><a href="/test-simple">/test-simple</a></li>
+        <li><a href="/db-info">/db-info</a></li>
+        <li><a href="/cart">/cart</a></li>
+    </ul>
+    """, 404    
+
 @app.route('/db-info')
 def db_info():
     import os
