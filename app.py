@@ -1012,6 +1012,51 @@ def debug_database_connection():
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
+@app.route('/db-connection-info')
+def db_connection_info():
+    import os
+    from urllib.parse import urlparse
+    
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url:
+        parsed = urlparse(db_url)
+        info = f"""
+        <h1>Información para DBeaver</h1>
+        <p><strong>Host:</strong> {parsed.hostname}</p>
+        <p><strong>Puerto:</strong> {parsed.port}</p>
+        <p><strong>Base de datos:</strong> {parsed.path[1:]}</p>
+        <p><strong>Usuario:</strong> {parsed.username}</p>
+        <p><strong>Contraseña:</strong> {parsed.password}</p>
+        """
+    else:
+        info = "<h1>DATABASE_URL no configurada</h1>"
+    
+    return info
+@app.route('/db-info')
+def db_info():
+    import os
+    from urllib.parse import urlparse
+    
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url:
+        parsed = urlparse(db_url)
+        info = f"""
+        <h1>Configuración para DBeaver</h1>
+        <div style='background:#f5f5f5; padding:20px; border-radius:10px;'>
+            <h3>📋 Datos de conexión:</h3>
+            <p><strong>Host:</strong> {parsed.hostname}</p>
+            <p><strong>Port:</strong> {parsed.port}</p>
+            <p><strong>Database:</strong> {parsed.path[1:]}</p>
+            <p><strong>Username:</strong> {parsed.username}</p>
+            <p><strong>Password:</strong> {parsed.password}</p>
+        </div>
+        <p><em>⚠️ Esta información es sensible. No la compartas.</em></p>
+        """
+    else:
+        info = "<h1>❌ DATABASE_URL no encontrada</h1>"
+    
+    return info    
+
 @app.route('/update-db-relations')
 def update_db_relations():
     from app import db
