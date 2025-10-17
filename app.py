@@ -123,6 +123,15 @@ def get_paypal_access_token():
         return None
 
 # RUTAS DE PRUEBA PARA DIAGNÓSTICO
+@app.route('/health')
+def health_check():
+    return "✅ HEALTH CHECK - APP RUNNING", 200
+
+@app.route('/test-simple')
+def test_simple():
+    return "<h1>✅ TEST SIMPLE FUNCIONANDO</h1><p>La aplicación está activa</p>"
+
+
 @app.route('/')
 def index():
     try:
@@ -1420,6 +1429,32 @@ def add_header(response):
     response.headers['Expires'] = '-1'
     return response
 
+# MANEJO GLOBAL DE ERRORES - AL FINAL DEL ARCHIVO
+@app.errorhandler(404)
+def not_found_error(error):
+    return "<h1>404 - Página no encontrada</h1><p>La ruta solicitada no existe.</p>", 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    import traceback
+    return f"""
+    <h1>500 - Error interno del servidor</h1>
+    <p><strong>Error:</strong> {str(error)}</p>
+    <h3>Debug info:</h3>
+    <pre>{traceback.format_exc()}</pre>
+    """, 500
+
+@app.errorhandler(Exception)
+def handle_all_errors(error):
+    import traceback
+    return f"""
+    <h1>Error en la aplicación</h1>
+    <p><strong>Tipo:</strong> {type(error).__name__}</p>
+    <p><strong>Mensaje:</strong> {str(error)}</p>
+    <h3>Traceback completo:</h3>
+    <pre>{traceback.format_exc()}</pre>
+    """, 500
+    
 # ✅ CREAR TABLAS SI NO EXISTEN
 with app.app_context():
     try:
